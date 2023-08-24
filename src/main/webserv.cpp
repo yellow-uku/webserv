@@ -1,5 +1,7 @@
 #include "webserv.hpp"
 
+void loop();
+
 int main(int argc, char **argv)
 {
 	(void)argc;
@@ -10,6 +12,7 @@ int main(int argc, char **argv)
 	try
 	{
 		conf.getLocationData("127.0.0.1", "8080", "server2", "/a").printEverything("");
+		// loop();
 	}
 	catch(const std::exception& e)
 	{

@@ -14,6 +14,8 @@ Config::Config(const std::string& filename): ConfigParser(filename), defaultLoca
 	defaultLocation.pushMethods("POST");
 }
 
+const Config::std::vector<Server>& getServers() { return servers; }
+
 const Location& Config::getLocationData(const std::string& host, const std::string& port, const std::string& serverName, const std::string& route)
 {
 	size_t count = std::count(servers.begin(), servers.end(), listen_t(host, port));

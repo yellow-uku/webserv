@@ -17,7 +17,7 @@
 # include "Util.hpp"
 # include "Server.hpp"
 
-# define DEFAULT_FILE_PATH "conf.d/webserv.conf"
+# define DEFAULT_FILE_PATH "conf.d/server1/webserv.conf"
 
 # define IS_OUTSIDE_LOCATION(token, prevToken) (strncmp(prevToken.c_str(), token.c_str(), prevToken.length()) != 0)
 
