@@ -14,7 +14,7 @@ Config::Config(const std::string& filename): ConfigParser(filename), defaultLoca
 	defaultLocation.pushMethods("POST");
 }
 
-const Config::std::vector<Server>& getServers() { return servers; }
+const std::vector<Server>& Config::getServers() { return servers; }
 
 const Location& Config::getLocationData(const std::string& host, const std::string& port, const std::string& serverName, const std::string& route)
 {
