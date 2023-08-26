@@ -33,7 +33,7 @@ void ConfigParser::generateTokens(const std::string &file)
 
 		if (file[i] == '#')
 		{
-			while (file[i] != '\n')
+			while (file[i] && file[i] != '\n')
 				++i;
 			continue ;
 		}
