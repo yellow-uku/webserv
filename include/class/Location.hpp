@@ -43,8 +43,8 @@ public:
 	const std::string& getValueOf(const std::string& directiveName) const ;
 	const std::vector<std::string>& getArrayOf(const std::string& directiveName) const ;
 
-	void printEverything(const std::string& indent) const ;
-	void printVectors(const std::vector<std::string>& vec, const std::string& indent) const ;
+	void printEverything() const ;
+	void printVectors(const std::vector<std::string>& vec) const ;
 
 public:
 	Location();

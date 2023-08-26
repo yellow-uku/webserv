@@ -113,6 +113,10 @@ void ConfigParser::setDefaults()
 		{
 			servers[i].pushListen(DEFAULT_HOST, DEFAULT_PORT);
 		}
+		if (servers[i].getMaxBodySize() == -1)
+		{
+			servers[i].setMaxBodySize(DEFAULT_MAX_BODY_SIZE);
+		}
 		for (LocationMap::reverse_iterator it = servers[i].locations.rbegin(); it != servers[i].locations.rend(); ++it)
 		{
 			init_locations(it->second, i);
@@ -189,6 +193,13 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 	}
 
 	setDefaults();
+
+	for (size_t i = 0; i < servers.size(); ++i)
+	{
+		std::cout << "\t\tSERVER " << i + 1 << "\n\n";
+		servers[i].print_everything();
+		std::cout << "\n\n";
+	}
 }
 
 ConfigParser::~ConfigParser() { }

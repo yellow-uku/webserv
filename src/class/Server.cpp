@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Server::Server(): max_body_size(DEFAULT_MAX_BODY_SIZE), listen(), error_pages(), server_names(), locations()
+Server::Server(): max_body_size(-1), listen(), error_pages(), server_names(), locations()
 {
 
 }
@@ -15,7 +15,7 @@ void Server::pushListen(const std::string& host, const std::string& port)
 	listen.push_back(listen_t(host, port));
 }
 
-void Server::setMaxBodySize(size_t	l) { max_body_size = l; }
+void Server::setMaxBodySize(ssize_t l) { max_body_size = l; }
 
 void Server::pushServerName(const std::string& server_name)
 {
@@ -25,7 +25,7 @@ void Server::pushServerName(const std::string& server_name)
 
 void Server::pushErrorPage(int error_code, const std::string& error_page) { error_pages[error_code] = error_page; }
 
-size_t Server::getMaxBodySize() const { return max_body_size; }
+ssize_t Server::getMaxBodySize() const { return max_body_size; }
 
 const std::vector<listen_t>& Server::getListens() const { return listen; }
 
@@ -35,25 +35,29 @@ const std::vector<std::string>& Server::getServerNames() const { return server_n
 
 void Server::print_everything()
 {
-	std::cout << "Server names: ";
+	std::cout << "SERVER_NAMES:\t";
 	printVectors(server_names);
-	std::cout << "Listen: ";
+	std::cout << "LISTEN:\t\t";
 	printVectors(listen);
-	std::cout << "Error pages: \n";
+	std::cout << "ERROR_PAGES: \n";
 
+	int i = 0;
 	for (std::map<int, std::string>::iterator it = error_pages.begin(); it != error_pages.end(); ++it)
-		std::cout << "  " << it->first << " " << it->second << " \n";
+	{
+		std::cout << "\t" << ++i <<". " <<  it->first << " " << it->second << " \n";
+	}
 
-	std::cout << "\n";
-	std::cout << "Max body size: " << max_body_size << "\n";
-	std::cout << "Locations: \n--------\n";
+	std::cout << "\nMAX_BODY_SIZE:\t"<< max_body_size << "\n\n";
+	std::cout << "\t\tLOCATIONS:\n\n";
 
+	i = 0;
 	for (LocationMap::iterator it = locations.begin(); it != locations.end(); ++it)
 	{
-		it->second.printEverything("  ");
-		std::cout << "++++++++++++++\n\n";
+		std::cout << "--------------- LOCATION: " << ++i << " ---------------\n\n";
+		it->second.printEverything();
+		// std::cout << "---------------------------------\n\n";
 	}
-	std::cout << "--------\n";
+	// std::cout << "--------\n";
 }
 
 bool Server::operator==(const std::string& serverName)
@@ -69,6 +73,7 @@ bool Server::operator==(const listen_t& lst)
 template <typename T>
 void Server::printVectors(const std::vector<T>& vec)
 {
+	std::cout << "\t";
 	for (size_t i = 0; i < vec.size(); ++i)
 	{
 		std::cout << vec[i] << " ";

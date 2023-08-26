@@ -65,26 +65,26 @@ const std::vector<std::string>& Location::getArrayOf(const std::string& directiv
 	return _indexes;
 }
 
-void Location::printEverything(const std::string& indent) const
+void Location::printEverything() const
 {
-	std::cout << indent << "Parent: " << _parent << "\n";
-	std::cout << indent << "Location_level: " << _location_level << "\n";
-	std::cout << indent << "Cgi: " << _cgi << "\n";
-	std::cout << indent << "Root: " << _root << "\n";
-	std::cout << indent << "Autoindex: " << _autoindex << "\n";
-	std::cout << indent << "Http Redirection: " << _httpRedir << "\n";
-	std::cout << indent << "Upload Dir: " << _upload_dir << "\n";
-	std::cout << indent << "Indexes: \n";
-	printVectors(_indexes, indent + "\t");
-	std::cout << indent << "Allowed_methods: \n";
-	printVectors(_allowed_methods, indent + "\t");
+	std::cout << "\t" << "PARENT:\t\t" << (_parent == "" ? "EMPTY" : _parent) << "\n";
+	// std::cout << "\t" << "Location_level: " << _location_level << "\n";
+	std::cout << "\t" << "CGI:\t\t" << _cgi << "\n";
+	std::cout << "\t" << "ROOT:\t\t" << _root << "\n";
+	std::cout << "\t" << "AUTO_INDEX:\t" << _autoindex << "\n";
+	std::cout << "\t" << "HTTP_REDIR:\t" << (_httpRedir == "" ? "EMPTY" : _httpRedir)  << "\n";
+	std::cout << "\t" << "UPLOAD_DIR:\t" << _upload_dir << "\n";
+	std::cout << "\t" << "INDEX_PAGES: \n";
+	printVectors(_indexes);
+	std::cout << "\t" << "ALLOWED_METHODS: \n";
+	printVectors(_allowed_methods);
 }
 
-void Location::printVectors(const std::vector<std::string>& vec, const std::string& indent) const
+void Location::printVectors(const std::vector<std::string>& vec) const
 {
 	for (size_t i = 0; i < vec.size(); ++i)
 	{
-		std::cout << indent << vec[i] << " ";
+		std::cout << "\t\t" <<  i + 1 << ". " << vec[i] << std::endl;	;
 	}
 	std::cout << "\n";
 }

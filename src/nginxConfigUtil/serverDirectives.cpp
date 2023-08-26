@@ -88,7 +88,7 @@ void ConfigParser::maxBodySize(const std::vector<std::string>& tokens, size_t& s
 
 	size_t count = ++i;
 
-	if (std::count(tokens.begin(), tokens.end(), "client_max_body_size") != 1)
+	if (servers[server_index].getMaxBodySize() != -1)
 		throw std::runtime_error("duplicate client_max_body_size directive");
 
 	while (tokens[count] !=  ";" && tokens[count] != "{" && tokens[count] != "}")

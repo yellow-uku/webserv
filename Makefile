@@ -13,11 +13,12 @@ INCLUDES	= $(addprefix -I $(INCDIR), $(MODULES))
 SRCS		= $(foreach dir, $(SRCDIR), $(wildcard $(dir)/*.cpp))
 TEMP		= $(subst $(SDIR),$(ODIR),$(SRCS))
 OBJS		= $(subst .cpp,.o,$(TEMP))
+HEADERS		= $(foreach dir, $(INCLUDES), $(wildcard $(dir)/*.hpp))
 
 vpath %.cpp $(SRCDIR)
 
 define compile
-$1/%.o: %.cpp
+$1/%.o: %.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $$< -o $$@
 endef 
 
