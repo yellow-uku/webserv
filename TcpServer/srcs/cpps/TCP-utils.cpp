@@ -58,13 +58,15 @@ void	TCPserver::createSocketAndAddToSet(std::vector<struct server_infos> &data){
         FD_ZERO(&wr_undo);
 	for(std::vector<struct server_infos>::iterator it = data.begin();it != data.end();it++)
 	{
+                // forLoc.redirect = "http://localhost:" + std::to_string(it->port) + "/specify.html";
+                // forLoc.redirect = "/specify.html";
+                forLoc.redirect = "/barev/";
 		createSocket(it->port);
                 server_data[it->port] = *it;
                 server_data[it->port].error_pages[404] = "not_found.html";
                 server_data[it->port].error_pages[403] = "forbidden.html";
-                // server_data[it->port].redirect = std::string("localhost:") + std::to_string(it->port) + "/specify.html";
                 server_data[it->port].root = std::string("../../web");
                 server_data[it->port].autoindex = false;
-                server_data[it->port].location["barev/"] = forLoc;
+                server_data[it->port].location["barev"] = forLoc;
 	}
 }

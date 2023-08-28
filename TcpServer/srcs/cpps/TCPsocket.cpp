@@ -72,7 +72,7 @@ int	TCPserver::acceptclnt()
 	{
 	if (FD_ISSET(k, &wrset))// && std::find(sock.begin(), sock.end(), k) == sock.end())
 	{
-		// std::cout << "requested-path" << clients[k].full_path << std::endl;
+		std::cout << "full response " << clients[k].response << std::endl;
 		sendResponse(k);
 		// std::cout << "write seti mejic k is ->"<< k << std::endl;
 		close (k);
@@ -95,7 +95,7 @@ int	TCPserver::acceptclnt()
 			FD_CLR(k, &wr_undo); //wr_undo
 			break;
 		}
-		clients[k].response = setResponseFile(k);
+		setResponseFile(k);
 		// FD_CLR(k, &undo); //wr_undo
 		FD_SET(k, &wr_undo);
 		FD_SET(k, &wrset);
@@ -319,22 +319,26 @@ struct server_infos TCPserver::correctInfos(struct server_infos &infos, std::str
 	return infos.location[name];
 }
 
-bool 	TCPserver::isRedirect(struct server_infos &data,std::string &headers, int i)
+bool 	TCPserver::isRedirect(response_headers &headData, struct server_infos &servData, int i)
 {
-	std::cout << clients[i].url << " <-----> " << data.redirect << std::endl;
-	// if(!data.redirect.size() || clients[i].url == data.redirect)
-	// 	return false;
-	headers = "HTTP/1.1 307 Temporary Redirect\r\n"
-"Location: localhost:202/index.html\r\n"
-"Content-Length: 0\r\n"
-"Connection: close\r\n"
-"Content-Type: text/html; charset=UTF-8\r\n"
-"\r\n"
-;
+	std::cout << "mtav mejy" << std::endl;
+	if (servData.redirect.front() == '/')
+		servData.redirect.erase(0,1);
+	std::cout << "url ->" << clients[i].url << " --> redirect" << servData.redirect << std::endl;
+	if(!servData.redirect.size() || clients[i].url == servData.redirect)
+		return false;
+	(void) headData;
+	clients[i].response = "HTTP/1.1 307 Temporary Redirect\r\n"
+	"HTTP/1.1 307 Temporary Redirect\r\n"
+	"Location: " + servData.redirect +"\r\n"
+	"Content-Length: 0\r\n"
+	"Connection: close\r\n"
+	"Content-Type: text/html; charset=UTF-8\r\n"
+	"\r\n";
 	return true;
 }
 
-std::string	TCPserver::setResponseFile(int i)
+void	TCPserver::setResponseFile(int i)
 {
 	std::string fileName;
 	std::string response;
@@ -342,8 +346,6 @@ std::string	TCPserver::setResponseFile(int i)
 	struct server_infos servData;
 	short		portN = 0;
 	response_headers heading;
-	//response headernern el stackum haytararel
-	write(1, "aaaa\n", 6);
 	portN = atoi(clients[i].requestHeaders["Host"].c_str() + clients[i].requestHeaders["Host"].find(':') + 1);
 	std::cout << "port number" << portN  << "\n\n\n"<< std::endl;
 	if (isLocation(server_data[portN],clients[i].url))
@@ -355,9 +357,10 @@ std::string	TCPserver::setResponseFile(int i)
 	}
 	if (servData.root.back() != '/')
 		servData.root += "/";
-	fileName = servData.root + clients[i].url;
 	heading.http_status = "200";
-	static int b = 0;
+	if (isRedirect(heading,servData,i))
+		return ;
+	fileName = servData.root + clients[i].url;
 	if (isDir(fileName))
 	{
 		if (!servData.autoindex)
@@ -381,8 +384,7 @@ std::string	TCPserver::setResponseFile(int i)
 			response += listDir(fileName);
 			clients[i].response = response;
 			clients[i].full_path = fileName;
-			std::cout << "response ---0000000000----------> " << response;
-			return response;
+			return ;
 		}
 	}
 	else if(access(fileName.c_str(), F_OK) == -1)//not found 404
@@ -408,8 +410,7 @@ std::string	TCPserver::setResponseFile(int i)
 	response += readFile(fileName);
 	clients[i].full_path = fileName;
 	clients[i].response = response;
-	std::cout << "response -------------> " << response;
-	return response;
+	return ;
 }
 
 bool TCPserver::isDir(std::string &name)
@@ -457,7 +458,7 @@ std::string TCPserver::listDir(std::string &name)
 
 void	TCPserver::sendResponse(int clnt)
 {
-	std::cout << "resp - >" << clients[clnt].response.c_str() << std::endl;
+	// std::cout << "resp - >" << clients[clnt].response.c_str() << std::endl;
 	if (send(clnt, clients[clnt].response.c_str(), clients[clnt].response.size(), 0) < 0)
 	{
 		std::cerr << "Send() failed" << std::endl;

@@ -26,7 +26,7 @@ struct	server_infos{
 	size_t 			max_body_size;
 	//cgi
 	//upload dir
-	std::string	 redirect;
+	std::string	 redirect; 
 	//client_max_body_size
 	std::map<std::string,struct server_infos> location;
 };
@@ -56,14 +56,14 @@ class TCPserver{
 		std::string		find_and_set_cont_type(int i);
 		void		createSocketAndAddToSet(std::vector<struct server_infos> &);
 		void		createSocket(int port);
-		std::string		setResponseFile(int i);
+		void		setResponseFile(int i);
 		bool		thereIsNoIndexFile(short);
 		std::string correctIndexFile(std::string &,short);
 		bool		isDir(std::string &);
 		std::string listDir(std::string &);	
 		bool		isLocation(struct server_infos &,std::string &);
 		struct server_infos correctInfos(struct server_infos &,std::string &);
-		bool 		isRedirect(struct server_infos &,std::string &, int);
+		bool 		isRedirect(response_headers &, struct server_infos &, int);
 //		struct sockaddr_in servAddr[2];
 //////////////
 		std::string readLine(std::string &,size_t &);
