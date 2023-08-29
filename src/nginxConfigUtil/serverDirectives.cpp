@@ -121,32 +121,35 @@ bool ConfigParser::containsSpecialChar(const std::string& token)
 // g: Gigabytes	-> 10^9
 size_t ConfigParser::getActualBodySize(const std::string& token)
 {
-	char unit = std::tolower(token[token.size() - 1]);
-	std::string val = token.substr(0, token.length() - 1);
+	if (!std::isdigit(token[token.size() - 1]))
+	{
+		char		unit = std::tolower(token[token.size() - 1]);
+		std::string	val = token.substr(0, token.length() - 1);
+		int			to_int = my_stoi(val);
+		if (to_int < 0)
+			throw std::runtime_error("invalid max_body_size value");
 
-	int to_int = my_stoi(val);
+		if (!std::isdigit(unit))
+		{
+			size_t power = 1;
 
+			if (unit == 'k')
+				power = std::pow(10, 3);
+			else if (unit == 'm')
+				power = std::pow(10, 6);
+			else if (unit == 'g')
+				power = std::pow(10, 9);
+			else
+				throw std::runtime_error("invalid max_body_size value");
+
+			if ((unit == 'm' && to_int > std::pow(10, 5)) || (unit == 'g' && to_int > std::pow(10, 3)))
+				throw std::runtime_error("invalid max_body_size value");
+			return static_cast<size_t>(to_int) * power;
+		}
+	}
+	int to_int = my_stoi(token);
 	if (to_int < 0)
 		throw std::runtime_error("invalid max_body_size value");
-
-	if (!std::isdigit(unit))
-	{
-		size_t power = 1;
-
-		if (unit == 'k')
-			power = std::pow(10, 3);
-		else if (unit == 'm')
-			power = std::pow(10, 6);
-		else if (unit == 'g')
-			power = std::pow(10, 9);
-		else
-			throw std::runtime_error("invalid max_body_size value");
-
-		if ((unit == 'm' && to_int > std::pow(10, 5)) || (unit == 'g' && to_int > std::pow(10, 3)))
-			throw std::runtime_error("invalid max_body_size value");
-
-		return static_cast<size_t>(to_int) * power;
-	}
 
 	return static_cast<size_t>(to_int);
 }
