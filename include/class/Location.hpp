@@ -5,8 +5,8 @@
 # include <list>
 # include <vector>
 # include <iostream>
+# include <algorithm>
 
-# define DEFAULT_ROOT "www/"
 # define HTTP_REDIRECTION ""
 # define ALLOWED_METHODS "GET"
 # define DEFAULT_AUTOINDEX "off"

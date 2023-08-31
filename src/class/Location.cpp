@@ -1,7 +1,7 @@
 #include "Location.hpp"
 
 Location::Location():
-	_location_level(1), _cgi(DEFAULT_CGI), _root(DEFAULT_ROOT), _autoindex(DEFAULT_AUTOINDEX), _httpRedir(HTTP_REDIRECTION),
+	_location_level(1), _cgi(DEFAULT_CGI), _root(), _autoindex(DEFAULT_AUTOINDEX), _httpRedir(HTTP_REDIRECTION),
 	_upload_dir(UPLOAD_DIRECTORY), _indexes(), _allowed_methods(), _parent()
 {
 

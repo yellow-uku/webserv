@@ -1,5 +1,23 @@
 #include "ConfigParser.hpp"
 
+void ConfigParser::root(const std::vector<std::string>& tokens, size_t& server_index, size_t& i)
+{
+	size_t count = ++i;
+
+	while (tokens[count] !=  ";" && tokens[count] != "{" && tokens[count] != "}")
+	{
+		servers[server_index].setRoot(tokens[count]);
+
+		++count;
+	}
+
+	if (count == i || count - 1 != i || tokens[count] != ";")
+		throw std::runtime_error("invalid root directive");
+
+	i = count;
+}
+
+
 void ConfigParser::serverName(const std::vector<std::string>& tokens, size_t& server_index, size_t& location_level, size_t& i)
 {
 	if (location_level != 1)
@@ -144,6 +162,7 @@ size_t ConfigParser::getActualBodySize(const std::string& token)
 			throw std::runtime_error("invalid max_body_size value");
 		return static_cast<size_t>(to_int) * power;
 	}
+
 	int to_int = my_stoi(token);
 	if (to_int < 0)
 		throw std::runtime_error("invalid max_body_size value");

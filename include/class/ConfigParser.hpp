@@ -58,6 +58,8 @@ private:
 	std::string	storeIP(const std::string& _host, int count) const ;
 
 private:
+	void	root(const std::vector<std::string>& tokens, size_t& server_index, size_t& i);
+
 	void	listen(const std::vector<std::string>& tokens, size_t& server_index, size_t& location_level, size_t& i);
 	void	errorPage(const std::vector<std::string>& tokens, size_t& server_index, size_t& location_level, size_t& i);
 	void	serverName(const std::vector<std::string>& tokens, size_t& server_index, size_t& location_level, size_t& i);

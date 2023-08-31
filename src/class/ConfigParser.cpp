@@ -84,6 +84,10 @@ void ConfigParser::init_locations(Location& location, const size_t& server_index
 	}
 	else
 	{
+		if (location.getValueOf("root") == "")
+		{
+			location.setRoot(servers[server_index].getRoot());
+		}
 		if (location.getArrayOf("index").size() == 0)
 		{
 			location.pushIndexes("index.html");
@@ -100,6 +104,10 @@ void ConfigParser::setDefaults()
 {
 	for (size_t i = 0; i < servers.size(); ++i)
 	{
+		if (servers[i].getRoot() == "")
+		{
+			servers[i].setRoot(DEFAULT_ROOT);
+		}
 		if (servers[i].getErrorPages().size() == 0)
 		{
 			servers[i].pushErrorPage(403, DEFAULT_403_PAGE);
@@ -157,9 +165,10 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 			errorPage(tokens, server_index, location_level, i);
 		else if (contains(single_value_directives_location, tokens[i]))
 		{
-			if (location_level <= 1)
-				throw std::runtime_error(tokens[i] + " is not allowed here");
- 			setProperties(servers[server_index].locations[current_location.back()], tokens, i);
+			if (location_level == 1)
+				root(tokens, server_index, i);
+			else
+ 				setProperties(servers[server_index].locations[current_location.back()], tokens, i);
 		}
 		else if (contains(array_value_directives_location, tokens[i]))
 		{

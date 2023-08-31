@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Server::Server(): max_body_size(-1), listen(), error_pages(), server_names(), locations()
+Server::Server(): max_body_size(-1), root(), listen(), error_pages(), server_names(), locations()
 {
 
 }
@@ -17,6 +17,11 @@ void Server::pushListen(const std::string& host, const std::string& port)
 
 void Server::setMaxBodySize(ssize_t l) { max_body_size = l; }
 
+void Server::setRoot(const std::string& rt)
+{
+	root = (rt[0] == '/' ? rt : DEFAULT_ROOT + rt);
+}
+
 void Server::pushServerName(const std::string& server_name)
 {
 	if (std::find(server_names.begin(), server_names.end(), server_name) == server_names.end())
@@ -27,6 +32,8 @@ void Server::pushErrorPage(int error_code, const std::string& error_page) { erro
 
 ssize_t Server::getMaxBodySize() const { return max_body_size; }
 
+const std::string& Server::getRoot() const { return root; }
+
 const std::vector<listen_t>& Server::getListens() const { return listen; }
 
 const std::map<int, std::string>& Server::getErrorPages() const { return error_pages; }
@@ -35,6 +42,7 @@ const std::vector<std::string>& Server::getServerNames() const { return server_n
 
 void Server::print_everything()
 {
+	std::cout << "ROOT:\t\t\t" << root << "\n";
 	std::cout << "SERVER_NAMES:\t";
 	printVectors(server_names);
 	std::cout << "LISTEN:\t\t";
@@ -53,7 +61,7 @@ void Server::print_everything()
 	i = 0;
 	for (LocationMap::iterator it = locations.begin(); it != locations.end(); ++it)
 	{
-		std::cout << "--------------- LOCATION: " << ++i << " ---------------\n\n";
+		std::cout << "--------------- LOCATION: " << it->first << " ---------------\n\n";
 		it->second.printEverything();
 		// std::cout << "---------------------------------\n\n";
 	}

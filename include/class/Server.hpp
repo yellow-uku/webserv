@@ -20,7 +20,9 @@
 class Server
 {
 private:
+
 	ssize_t								max_body_size;
+	std::string							root;
 	std::vector<listen_t>				listen;
 	std::map<int, std::string>			error_pages;
 	std::vector<std::string> 			server_names;
@@ -32,11 +34,13 @@ public:
 public:
 	void pushListen(const std::string& host, const std::string& port);
 	void setMaxBodySize(ssize_t l);
+	void setRoot(const std::string& rt);
 	void pushServerName(const std::string& server_name);
 	void pushErrorPage(int error_code, const std::string& error_page);
 
 public:
 	ssize_t getMaxBodySize() const ;
+	const std::string& getRoot() const ;
 	const std::vector<listen_t>& getListens() const ;
 	const std::map<int, std::string>& getErrorPages() const ;
 	const std::vector<std::string>& getServerNames() const ;
