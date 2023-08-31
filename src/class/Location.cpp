@@ -68,7 +68,6 @@ const std::vector<std::string>& Location::getArrayOf(const std::string& directiv
 void Location::printEverything() const
 {
 	std::cout << "\t" << "PARENT:\t\t" << (_parent == "" ? "EMPTY" : _parent) << "\n";
-	// std::cout << "\t" << "Location_level: " << _location_level << "\n";
 	std::cout << "\t" << "CGI:\t\t" << _cgi << "\n";
 	std::cout << "\t" << "ROOT:\t\t" << _root << "\n";
 	std::cout << "\t" << "AUTO_INDEX:\t" << _autoindex << "\n";
@@ -84,7 +83,7 @@ void Location::printVectors(const std::vector<std::string>& vec) const
 {
 	for (size_t i = 0; i < vec.size(); ++i)
 	{
-		std::cout << "\t\t" <<  i + 1 << ". " << vec[i] << std::endl;	;
+		std::cout << "\t\t" <<  i + 1 << ". " << vec[i] << "\n";
 	}
 	std::cout << "\n";
 }

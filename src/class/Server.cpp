@@ -63,9 +63,7 @@ void Server::print_everything()
 	{
 		std::cout << "--------------- LOCATION: " << it->first << " ---------------\n\n";
 		it->second.printEverything();
-		// std::cout << "---------------------------------\n\n";
 	}
-	// std::cout << "--------\n";
 }
 
 bool Server::operator==(const std::string& serverName)
