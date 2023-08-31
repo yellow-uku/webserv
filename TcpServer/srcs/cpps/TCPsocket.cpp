@@ -1,5 +1,9 @@
 # include "../headers/TCPsocket.hpp"
 # include <algorithm>
+#include <sys/types.h>
+	#include <sys/stat.h>
+#include <unistd.h>
+#include <bitset>
 TCPserver::TCPserver(std::vector<struct server_infos> data)
 {
 	myenv=NULL;
@@ -46,6 +50,7 @@ int	TCPserver::acceptclnt()
 	{
 	myTime.tv_sec = 0;
 	myTime.tv_usec = 0;
+	// bzero(&clntAddr,sizeof(struct sockaddr_in));
 	ret = 0;
 	k = 0;
 	clnt = 0;
@@ -64,7 +69,7 @@ int	TCPserver::acceptclnt()
 	rc = select(max_fd, &set, &wrset, NULL,&myTime);
 	// std::cout << "select unblocks" << std::endl;
 	if (rc > 0)
-	// std::cout << "select return value" << rc << std::endl;
+	std::cout << "select return value" << rc << "maxfd "  << max_fd << std::endl;
 	if (rc == 0)
 		continue;
 	enable = 1;
@@ -72,9 +77,9 @@ int	TCPserver::acceptclnt()
 	{
 	if (FD_ISSET(k, &wrset))// && std::find(sock.begin(), sock.end(), k) == sock.end())
 	{
-		std::cout << "full response " << clients[k].response << std::endl;
+		// std::cout << "full response " << clients[k].response << std::endl;
 		sendResponse(k);
-		// std::cout << "write seti mejic k is ->"<< k << std::endl;
+		std::cout << "write seti mejic k is ->"<< k << std::endl;
 		close (k);
 		clients.erase(clients.find(k));
 		allFd.erase(std::find(allFd.begin(), allFd.end(), k));
@@ -84,8 +89,9 @@ int	TCPserver::acceptclnt()
 	}
 	else if (FD_ISSET(k, &set) && std::find(sock.begin(), sock.end(), k) == sock.end())
 	{
-		// std::cout << "read seti mejic k is ->"<< k << std::endl;
+		std::cout << "read seti mejic k is ->"<< k << std::endl;
 		ret = recvfully(k);
+		std::cout << "line - >" << __LINE__ << std::endl; 	
 		// std::cout << "recieved" << std::endl;
 		if (ret <= 0)
 		{
@@ -95,6 +101,7 @@ int	TCPserver::acceptclnt()
 			FD_CLR(k, &wr_undo); //wr_undo
 			break;
 		}
+		std::cout << "line - >" << __LINE__ << std::endl;
 		setResponseFile(k);
 		// FD_CLR(k, &undo); //wr_undo
 		FD_SET(k, &wr_undo);
@@ -106,8 +113,9 @@ int	TCPserver::acceptclnt()
 	}
 	if (FD_ISSET(k,&set) && std::find(sock.begin(), sock.end(), k) != sock.end())
 	{
+		std::cout << "serveri acceptic seti mejic kkkkk is ->"<< k	 << std::endl;
 		clnt = accept(k, (struct sockaddr *)&clntAddr, &clntAddrlen);
-		// std::cout << "serveri acceptic seti mejic clnt is ->"<< clnt	 << std::endl;
+		std::cout << "serveri acceptic seti mejic clnt is ->"<< clnt	 << std::endl;
 		if (clnt > max_fd)
 			max_fd = clnt;
 		allFd.push_back(clnt);
@@ -119,7 +127,8 @@ int	TCPserver::acceptclnt()
 		//std::cout << "added" << std::endl;
 		if (clnt < 0)
 		{
-			std::cerr << "accept failed" << std::endl;
+			std::cerr << "accept failed -> " << errno << std::endl;
+			perror("aa");
 			exit (0);
 		}
 		if(inet_ntop(AF_INET, &clntAddr.sin_addr.s_addr, clntaddress, sizeof(clntaddress)) == NULL)
@@ -201,7 +210,7 @@ std::string TCPserver::readLine(std::string &all,size_t &start)
 		return all;
 	len = len - start + 1;
 	retVal =  all.substr(start,len);
-	start += len;
+	start += len;	
 	return retVal;
 }
 bool TCPserver::findKeyValue(std::string &line, size_t index)
@@ -216,6 +225,7 @@ bool TCPserver::findKeyValue(std::string &line, size_t index)
 	clients[index].requestHeaders[kval] = vval;
 	return true;
 }
+
 void	TCPserver::parseRequest(std::string &content, int i)
 {
 	std::string key, value;
@@ -229,7 +239,17 @@ void	TCPserver::parseRequest(std::string &content, int i)
 		if(!findKeyValue(line,i))
 			break;
 	}
-	clients[i].requestBody = clients[i].allRequest.substr(beg);
+	std::cout << "my var -> " << beg << " actual size ->" << clients[i].allRequest.size() << "\n" << content <<  std::endl;
+	if (beg < content.size() - 1)
+	{
+		clients[i].requestBody = clients[i].allRequest.substr(beg);
+		std::cout << "substrrrrr" << std::endl;
+	}
+	else
+	{
+		clients[i].requestBody = "a";
+		std::cout << "vasvsacasdasd" << std::endl;
+	}
 	// std::cout << clients[i].requestBody;
 	// std::cout << "client body ------------->\n" <<  clients[i].requestBody  << "\n end of body----<"<< std::endl;
 
@@ -240,6 +260,7 @@ void	TCPserver::parseRequest(std::string &content, int i)
 	// std::cout << "vvv->" << clients[i].requestHeaders["Host"] << std::endl;
 	setUrl_and_Method(i);
 }
+
 int TCPserver::recvfully(int clnt)
 {
 	int bytes = 0;
@@ -252,12 +273,15 @@ int TCPserver::recvfully(int clnt)
 	buff[bytes] = '\0';
 	for(std::vector<char>::iterator it = buff.begin(); it != buff.end(); it++)
 	{
+		bytes--;
 		rt += *it;
+		if (bytes == -1)
+			break;
 	}
-	std::cout << "recieved ->" << rt << "endl--->" << std::endl;
-	clients[clnt].allRequest = rt;
+	// std::cout << "recieved ->" << rt << "endl--->" << std::endl;
+	clients[clnt].allRequest = std::string(rt);
 	parseRequest(rt, clnt);
-	return bytes;
+	return 1;
 }
 /*
   	HTTP/1.1 200 OK\r\n"
@@ -280,18 +304,18 @@ std::string	TCPserver::find_and_set_cont_type(int i)
 	return (std::string("text/html"));
 }
 
-bool	TCPserver::thereIsNoIndexFile(short portN)
+bool	TCPserver::thereIsNoIndexFile(struct server_infos &servData)
 {
-	if (server_data[portN].index_files.size() == 0)
+	if (servData.index_files.size() == 0)
 		return true;
 	else
 		return false;
 }
 
-std::string TCPserver::correctIndexFile(std::string &fileName, short portN)
+std::string TCPserver::correctIndexFile(std::string &fileName, struct server_infos &servData)
 {
 	std::string full_path;
-	for (std::vector<std::string>::iterator it = server_data[portN].index_files.begin(); it < server_data[portN].index_files.end(); ++it)
+	for (std::vector<std::string>::iterator it = servData.index_files.begin(); it < servData.index_files.end(); ++it)
 	{
 		full_path = fileName + *it;
 		if (access(full_path.c_str(), F_OK & R_OK) == 0)
@@ -299,7 +323,7 @@ std::string TCPserver::correctIndexFile(std::string &fileName, short portN)
 			return full_path;
 		}
 	}
-	return 	server_data[portN].root + "/" + server_data[portN].error_pages[404];
+	return 	servData.root + "/" + servData.error_pages[404];
 
 }
 
@@ -338,11 +362,112 @@ bool 	TCPserver::isRedirect(response_headers &headData, struct server_infos &ser
 	return true;
 }
 
+bool TCPserver::checkDir(std::string &dirName,response_headers & heading,struct server_infos &servData)
+{
+	struct stat fs;
+	size_t len, start = 1;
+	bool 	forwhile = true;
+	std::string dName;
+		std::cout << "chediri dursn" << std::endl;
+	std::cout << "mode" << std::bitset<2>(fs.st_mode) << std::endl;
+	std::cout << "macro" << std::bitset<2>(S_IXOTH) << std::endl;
+	while(forwhile)
+	{
+		len = dirName.find("/",start);
+		if (len == std::string::npos)
+		{
+			dName = dirName;
+			forwhile = false;
+		}
+		else
+			dName = dirName.substr(0,len);
+		std::cout << len << " dir name ->" << dName << std::endl;
+		start = len + 1;
+		stat(dName.c_str(),&fs);
+		if(!(S_IXOTH & fs.st_mode))
+		{
+			std::cout << "chediri mejna" << std::endl;
+			dirName = servData.root + "/" + servData.error_pages[403];
+			heading.http_status = "403";
+			return true;
+		}
+	}
+	return false;
+}
+
+bool TCPserver::checkFile(std::string &fileName,response_headers & heading,struct server_infos &servData)
+{
+	struct stat fs;
+	stat(fileName.c_str(),&fs);
+		std::cout << "chefile dursn" << std::endl;
+	if(access(fileName.c_str(), F_OK) == -1)
+	{
+		fileName = servData.root + "/" + servData.error_pages[404];
+		heading.http_status = "404";
+		return true;
+	}
+	else if(!(S_IROTH & fs.st_mode))
+	{
+		fileName = servData.root + "/" + servData.error_pages[403];
+		heading.http_status = "403";
+		return true;
+	}
+	return false;
+}
+
+void	TCPserver::buildResponse(std::string &fileName,response_headers & heading, bool dir, int i)
+{
+	std::string response;
+	std::string headers;
+	if (!dir)
+	{
+		heading.content_type = find_and_set_cont_type(i);
+		heading.build_headers();
+		headers = heading.headers;
+		response = headers;
+		response += readFile(fileName);
+		clients[i].full_path = fileName;
+		clients[i].response = response;
+	}
+	else
+	{
+		heading.build_headers();
+		headers = heading.headers;
+		response = headers;
+		response += listDir(fileName);
+		clients[i].response = response;
+		clients[i].full_path = fileName;
+	}
+}
+
+bool TCPserver::checkMethod(std::string &fileName,response_headers &heading, struct server_infos &servData,int i)
+{
+	for (std::vector<std::string>::iterator it = servData.allow_methods.begin(); it != servData.allow_methods.end(); ++it)
+	{
+		if (*it == clients[i].method)
+			return true;
+	}
+	heading.http_status = "405";
+	fileName = servData.root + "/" + servData.error_pages[405];
+	return false;
+}
+
+bool TCPserver::checkBodySize(std::string &fileName,response_headers &heading, struct server_infos &servData,int i)
+{	
+	std::cout << "sizeeeee ->" << clients[i].requestBody.length() << "<--" << std::endl;
+	if(clients[i].requestBody.size() > servData.max_body_size)
+	{
+		heading.http_status = "413";
+		fileName = servData.root + "/" + servData.error_pages[413];
+		return true;
+	}
+	return false;
+}
+
 void	TCPserver::setResponseFile(int i)
 {
 	std::string fileName;
 	std::string response;
-	std::string headers;
 	struct server_infos servData;
 	short		portN = 0;
 	response_headers heading;
@@ -361,55 +486,42 @@ void	TCPserver::setResponseFile(int i)
 	if (isRedirect(heading,servData,i))
 		return ;
 	fileName = servData.root + clients[i].url;
+	std::cout << "fileName - > " << fileName << std::endl;
+	if(!checkMethod(fileName,heading,servData,i) || checkBodySize(fileName,heading,servData,i))
+	{
+		buildResponse(fileName,heading, 0,i);
+		return;
+	}
 	if (isDir(fileName))
 	{
+		if (checkDir(fileName,heading,servData))
+		{
+			buildResponse(fileName,heading, 0, i);
+			return;
+		}
 		if (!servData.autoindex)
 		{
-			if (thereIsNoIndexFile(portN))
+			if (thereIsNoIndexFile(servData))
 			{
-				heading.http_status = "403";
-				fileName = servData.root + "/" + servData.error_pages[403];//403 Forbidden dnel es
+				// std::cout << "filename ->>>>>> > " << fileName << std::endl;
+				// heading.http_status = "403";
+				// fileName = servData.root + "/" + servData.error_pages[403];//403 Forbidden dnel es
+				fileName = "";
 			}
 			else
-				fileName = correctIndexFile(fileName,portN);
+			{
+				fileName = correctIndexFile(fileName,servData);
+				std::cout << "filename ->>>>>> vvvvvvvvvvvvv> " << fileName << std::endl;
+			}
 		}
 		else
 		{
-			// if (!isRedirect(servData,headers,i))
-			// {
-				heading.build_headers();
-				headers = heading.headers;
-			// }
-			response = headers;
-			response += listDir(fileName);
-			clients[i].response = response;
-			clients[i].full_path = fileName;
+			buildResponse(fileName,heading, 1, i);
 			return ;
 		}
 	}
-	else if(access(fileName.c_str(), F_OK) == -1)//not found 404
-	{
-		fileName = servData.root + "/" + servData.error_pages[404];
-		heading.http_status = "404";
-	}
-	//check body size ,client info requestBody
-	/*
-	1. Integrate py script with html page
-	2. 
-	
-	*/
-
-	//mnacac sax check anel
-	// if (!isRedirect(servData,headers,i))
-	// {
-		heading.content_type = find_and_set_cont_type(i);
-		heading.build_headers();
-		headers = heading.headers;
-	// }
-	response = headers;
-	response += readFile(fileName);
-	clients[i].full_path = fileName;
-	clients[i].response = response;
+	checkFile(fileName,heading,servData);// body,methods 
+	buildResponse(fileName,heading, 0,i);
 	return ;
 }
 
@@ -419,6 +531,7 @@ bool TCPserver::isDir(std::string &name)
     folder = opendir(name.c_str());
     if(folder == NULL)
     {
+		std::cout << name << " aaaaaaaaaaaaaaaaaaaaaaa\n";
 		return false;
     }
 	if (name.back() != '/')

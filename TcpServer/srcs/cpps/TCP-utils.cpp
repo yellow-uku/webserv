@@ -52,7 +52,7 @@ void	TCPserver::createSocketAndAddToSet(std::vector<struct server_infos> &data){
 
         struct server_infos forLoc;
         forLoc.root = "../../locWeb";
-        forLoc.error_pages[404] = "not_found.html";
+        forLoc.error_pages[404] = "404.html";
         forLoc.index_files.push_back("index.html");
         FD_ZERO(&undo);
         FD_ZERO(&wr_undo);
@@ -63,10 +63,16 @@ void	TCPserver::createSocketAndAddToSet(std::vector<struct server_infos> &data){
                 forLoc.redirect = "/barev/";
 		createSocket(it->port);
                 server_data[it->port] = *it;
-                server_data[it->port].error_pages[404] = "not_found.html";
-                server_data[it->port].error_pages[403] = "forbidden.html";
+                server_data[it->port].error_pages[404] = "404.html";
+                server_data[it->port].error_pages[403] = "403.html";
+                server_data[it->port].error_pages[413] = "413.html";
+                server_data[it->port].error_pages[405] = "405.html";
                 server_data[it->port].root = std::string("../../web");
                 server_data[it->port].autoindex = false;
+                server_data[it->port].max_body_size = 1024;
                 server_data[it->port].location["barev"] = forLoc;
+                server_data[it->port].allow_methods.push_back("GET");
+                server_data[it->port].allow_methods.push_back("POST");
+                
 	}
 }

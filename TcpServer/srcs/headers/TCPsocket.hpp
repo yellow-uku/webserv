@@ -19,7 +19,7 @@ struct	server_infos{
 	int				port;
 	std::string			server_name;
 	std::string			root;
-	std::map<std::string, bool>	allow_methods;//ogtagorcac chi
+	std::vector<std::string>	allow_methods;//ogtagorcac chi
 	std::vector<std::string>	index_files;
 	std::map<short,std::string> error_pages;
 	bool				autoindex;
@@ -57,13 +57,19 @@ class TCPserver{
 		void		createSocketAndAddToSet(std::vector<struct server_infos> &);
 		void		createSocket(int port);
 		void		setResponseFile(int i);
-		bool		thereIsNoIndexFile(short);
-		std::string correctIndexFile(std::string &,short);
+		bool		thereIsNoIndexFile(struct server_infos &servData);
+		std::string correctIndexFile(std::string &,struct server_infos &servData);
 		bool		isDir(std::string &);
 		std::string listDir(std::string &);	
 		bool		isLocation(struct server_infos &,std::string &);
 		struct server_infos correctInfos(struct server_infos &,std::string &);
 		bool 		isRedirect(response_headers &, struct server_infos &, int);
+		void	buildResponse(std::string &fileName,response_headers & heading, bool dir, int i);
+		bool checkFile(std::string &fileName,response_headers & heading,struct server_infos &servData);
+		bool checkDir(std::string &dirName,response_headers & heading,struct server_infos &servData);
+		bool checkMethod(std::string &fileName,response_headers &heading, struct server_infos &servData,int i);
+		bool checkBodySize(std::string &fileName,response_headers &heading, struct server_infos &servData,int i);
+
 //		struct sockaddr_in servAddr[2];
 //////////////
 		std::string readLine(std::string &,size_t &);
