@@ -1,9 +1,10 @@
 # include "TCPserver.hpp"
 
-void    TCPserver::mapToCharDblPtr(void)
+void	TCPserver::mapToCharDblPtr(void)
 {
 	if (myenv)
 			delete[] myenv;
+		
 	myenv = new char*[preEnv.size() + 1];
 	int i = 0;
 	std::string fullyline;
@@ -19,18 +20,18 @@ void    TCPserver::mapToCharDblPtr(void)
 	myenv[i] = NULL;
 }
 
-void    TCPserver::createEnvForCGI(void)
+void	TCPserver::createEnvForCGI(void)
 {
-        std::string             row;
-        std::fstream    stream("custom-env.txt");
-        preEnv.clear();
-        while (stream)
-        {
-			std::getline(stream, row);
-			if (row.empty())
-					break;
-			preEnv[row] = "";
-        }
-        preEnv["PATH"] = getenv("PATH");
+	std::string			 row;
+	std::fstream		stream("custom-env.txt");
+	preEnv.clear();
+	while (stream)
+	{
+		std::getline(stream, row);
+		if (row.empty())
+				break;
+		preEnv[row] = "";
+	}
+	preEnv["PATH"] = getenv("PATH");
 
 }

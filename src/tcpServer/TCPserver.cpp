@@ -1,17 +1,14 @@
 # include "TCPserver.hpp"
-# include <algorithm>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <unistd.h>
-# include <bitset>
 
-TCPserver::TCPserver(std::vector<struct Server_info> data)
+TCPserver::TCPserver(std::vector< Server_info> data)
 {
-	myenv=NULL;
+	myenv = NULL;
+
 	FD_ZERO(&set);
 	FD_ZERO(&undo);
 	FD_ZERO(&wr_undo);
 	FD_ZERO(&wrset);
+
 	createSocketAndAddToSet(data);
 }
 
@@ -26,135 +23,112 @@ std::string TCPserver::readFile(std::string filename)
 
 TCPserver::~TCPserver(){}
 
-int	TCPserver::acceptclnt()
+void TCPserver::acceptclnt()
 {
+	int max_fd;
+
 	struct sockaddr_in clntAddr;
-	int	clnt;
-	char clntaddress[INET_ADDRSTRLEN];
 	socklen_t clntAddrlen = sizeof(clntAddr);
+
 	int rc, ret = 0;
-	int k = 0;
+	int enable = 1;
+	
 	std::vector<int> allFd;
 	struct Client_info forCleaning;
-	struct timeval myTime;
+	
 
-	(void) rc;
-	//std::cout << "---------------------start-----------" << std::endl;
 	for(std::vector<int>::iterator it = sock.begin(); it != sock.end(); it++)
 	{
 		allFd.push_back(*it);
 	}
-	
-	int enable;
+
+	for(std::vector<int>::iterator it = allFd.begin(); it != allFd.end(); it++)
+	{
+		if (*it > ret)
+			ret = *it;
+	}
+
+	max_fd = ret;
+	ret = 0;
+
 	while(true)
 	{
-		myTime.tv_sec = 0;
-		myTime.tv_usec = 0;
-		// bzero(&clntAddr,sizeof(struct sockaddr_in));
-		ret = 0;
-		k = 0;
-		clnt = 0;
-		for(std::vector<int>::iterator it = allFd.begin(); it != allFd.end(); it++)
-		{
-			if (*it > ret)
-				ret = *it;
-		}
-		max_fd = ret + 1;
-		ret = 0;
 		FD_ZERO(&set);
 		FD_ZERO(&wrset);
 
 		memcpy(&set, &undo, sizeof(set));
 		memcpy(&wrset, &wr_undo, sizeof(wrset));
-		// std::cout << "select blocks" << std::endl;
-		rc = select(max_fd, &set, &wrset, NULL,&myTime);
-		// std::cout << "select unblocks" << std::endl;
-		if (rc > 0)
-			std::cout << "select return value" << rc << "maxfd "  << max_fd << std::endl;
+
+		rc = select(max_fd + 1, &set, &wrset, NULL, NULL);
+
+		std::cout << "select returned, " << rc << "\n";
+
 		if (rc == 0)
-			continue;
-		enable = 1;
-		while(k < max_fd) // <=
+			continue ;
+
+		for(int k = 0; k <= max_fd; ++k)
 		{
-			if (FD_ISSET(k, &wrset))// && std::find(sock.begin(), sock.end(), k) == sock.end())
+			if (FD_ISSET(k, &wrset))
 			{
-				// std::cout << "full response " << clients[k].response << std::endl;
 				sendResponse(k);
 				std::cout << "write seti mejic k is ->"<< k << std::endl;
 				close (k);
 				clients.erase(clients.find(k));
 				allFd.erase(std::find(allFd.begin(), allFd.end(), k));
-				FD_CLR(k, &wr_undo); //wr_undo
-				FD_CLR(k, &undo); //wr_undo
-				break;//pordzenq
+				FD_CLR(k, &wr_undo);
+				FD_CLR(k, &undo);
 			}
-			else if (FD_ISSET(k, &set) && std::find(sock.begin(), sock.end(), k) == sock.end())
+			if (FD_ISSET(k, &set) && std::find(sock.begin(), sock.end(), k) == sock.end())
 			{
 				std::cout << "read seti mejic k is ->"<< k << std::endl;
 				ret = recvfully(k);
-				std::cout << "line - >" << __LINE__ << std::endl; 	
-				// std::cout << "recieved" << std::endl;
+				std::cout << "line - >" << __LINE__ << std::endl;
+
 				if (ret <= 0)
 				{
 					close (k);
-					clients.erase(clients.find(k));
+					clients.erase(k);
 					allFd.erase(std::find(allFd.begin(), allFd.end(), k));
-					FD_CLR(k, &wr_undo); //wr_undo
-					break;
+					FD_CLR(k, &wr_undo);
+					FD_CLR(k, &undo);
+					std::cout << "ret <= 0\n";
+					break ;
 				}
 				std::cout << "line - >" << __LINE__ << std::endl;
 				setResponseFile(k);
-				// FD_CLR(k, &undo); //wr_undo
+
 				FD_SET(k, &wr_undo);
-				FD_SET(k, &wrset);
-				FD_CLR(k, &undo); //wr_undo
-				// std::cout << "requested-path" << clients[k].full_path << std::endl;
-				break;//pordzenq
+				FD_CLR(k, &undo);
 			}
-			if (FD_ISSET(k,&set) && std::find(sock.begin(), sock.end(), k) != sock.end())
+
+			std::cout << (FD_ISSET(k, &set)) << "  asdas \n";
+
+			if (FD_ISSET(k, &set) && std::find(sock.begin(), sock.end(), k) != sock.end())
 			{
 				std::cout << "serveri acceptic seti mejic kkkkk is ->"<< k	 << std::endl;
-				clnt = accept(k, (struct sockaddr *)&clntAddr, &clntAddrlen);
-				std::cout << "serveri acceptic seti mejic clnt is ->"<< clnt	 << std::endl;
+				int clnt = accept(k, (struct sockaddr *)&clntAddr, &clntAddrlen);
+				std::cout << "serveri acceptic seti mejic clnt is ->"<< clnt << std::endl;
+
 				if (clnt > max_fd)
 					max_fd = clnt;
 				allFd.push_back(clnt);
-				// FD_SET(clnt, &wr_undo);
-				// FD_SET(clnt, &wrset);
-				FD_SET(clnt, &set);
+
 				FD_SET(clnt, &undo);
 
-				//std::cout << "added" << std::endl;
 				if (clnt < 0)
 				{
 					std::cerr << "accept failed -> " << errno << std::endl;
-					perror("aa");
+					perror("accept");
 					exit (0);
 				}
-				if (inet_ntop(AF_INET, &clntAddr.sin_addr.s_addr, clntaddress, sizeof(clntaddress)) == NULL)
-				{
-					std::cerr << "ntop failed" << std::endl;
-					exit (0);
-				}
-				
-				fcntl(clnt, F_SETFL, O_NONBLOCK); //hishi baces es
 
-				if (setsockopt(clnt, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
-				{
-					perror("setsockopt(SO_REUSEADDR) failed");
-					exit(EXIT_FAILURE);
-				}
-				std::cout << "Connected -->" << clntaddress << "<--" << std::endl;
-				break;
+				fcntl(clnt, F_SETFL, O_NONBLOCK);
 			}
-			//std::cout << "----------------mid-------------" << k << std::endl;
-			k++;
+			std::cout << "----------------mid-------------" << k << std::endl;
 		}
-	//std::cout << "----------------end-------------" << std::endl;
 	}
-
-	return clnt;
 }
+
 bool customFind(std::string &str, char c)
 {
 	int len = str.length();
@@ -165,6 +139,7 @@ bool customFind(std::string &str, char c)
 	}
 	return false;
 }
+
 void TCPserver::setUrl_and_Method(int i)
 {
 	std::stringstream	ss;
@@ -188,7 +163,7 @@ void TCPserver::setUrl_and_Method(int i)
 		std::getline(ss, url, ' ');
 		uri = " ";
 	}
-	if(url.front() == '/')
+	if(url[0] == '/')
 		url = std::string(url.c_str() + 1);
 	clients[i].method = method;
 	clients[i].url = url;
@@ -302,12 +277,12 @@ std::string	TCPserver::find_and_set_cont_type(int i)
 	return (std::string("text/html"));
 }
 
-bool	TCPserver::thereIsNoIndexFile(struct Server_info &servData)
+bool	TCPserver::thereIsNoIndexFile(Server_info &servData)
 {
 	return servData.index_files.size() == 0;
 }
 
-std::string TCPserver::correctIndexFile(std::string &fileName, struct Server_info &servData)
+std::string TCPserver::correctIndexFile(std::string &fileName, Server_info &servData)
 {
 	std::string full_path;
 	for (std::vector<std::string>::iterator it = servData.index_files.begin(); it < servData.index_files.end(); ++it)
@@ -320,25 +295,26 @@ std::string TCPserver::correctIndexFile(std::string &fileName, struct Server_inf
 	return 	servData.root + "/" + servData.error_pages[404];
 }
 
-bool	TCPserver::isLocation(struct Server_info &info,std::string &name)
+bool	TCPserver::isLocation(Server_info &info,std::string &name)
 {
 	return info.location.count(name);
 }
 
-struct Server_info TCPserver::correctInfos(struct Server_info &infos, std::string & name)
+ Server_info TCPserver::correctInfos( Server_info &infos, std::string & name)
 {
 	return infos.location[name];
 }
 
-bool 	TCPserver::isRedirect(Response_headers &headData, struct Server_info &servData, int i)
+bool TCPserver::isRedirect(Response_headers &headData, Server_info &servData, int i)
 {
 	std::cout << "mtav mejy" << std::endl;
-	if (servData.redirect.front() == '/')
+	if (servData.redirect[0] == '/')
 		servData.redirect.erase(0,1);
 	std::cout << "url ->" << clients[i].url << " --> redirect" << servData.redirect << std::endl;
 	if(!servData.redirect.size() || clients[i].url == servData.redirect)
 		return false;
 	(void) headData;
+
 	clients[i].response = "HTTP/1.1 307 Temporary Redirect\r\n"
 	"HTTP/1.1 307 Temporary Redirect\r\n"
 	"Location: " + servData.redirect +"\r\n"
@@ -349,7 +325,7 @@ bool 	TCPserver::isRedirect(Response_headers &headData, struct Server_info &serv
 	return true;
 }
 
-bool TCPserver::checkDir(std::string &dirName,Response_headers & heading,struct Server_info &servData)
+bool TCPserver::checkDir(std::string &dirName,Response_headers & heading, Server_info &servData)
 {
 	struct stat fs;
 	size_t len, start = 1;
@@ -386,7 +362,7 @@ bool TCPserver::checkDir(std::string &dirName,Response_headers & heading,struct 
 	return false;
 }
 
-bool TCPserver::checkFile(std::string &fileName,Response_headers & heading,struct Server_info &servData)
+bool TCPserver::checkFile(std::string &fileName,Response_headers & heading, Server_info &servData)
 {
 	struct stat fs;
 	stat(fileName.c_str(),&fs);
@@ -433,7 +409,7 @@ void	TCPserver::buildResponse(std::string &fileName,Response_headers & heading, 
 	}
 }
 
-bool TCPserver::checkMethod(std::string &fileName,Response_headers &heading, struct Server_info &servData,int i)
+bool TCPserver::checkMethod(std::string &fileName,Response_headers &heading,  Server_info &servData,int i)
 {
 	for (std::vector<std::string>::iterator it = servData.allow_methods.begin(); it != servData.allow_methods.end(); ++it)
 	{
@@ -445,7 +421,7 @@ bool TCPserver::checkMethod(std::string &fileName,Response_headers &heading, str
 	return false;
 }
 
-bool TCPserver::checkBodySize(std::string &fileName,Response_headers &heading, struct Server_info &servData,int i)
+bool TCPserver::checkBodySize(std::string &fileName,Response_headers &heading,  Server_info &servData,int i)
 {	
 	std::cout << "sizeeeee ->" << clients[i].requestBody.length() << "<--" << std::endl;
 	if(clients[i].requestBody.size() > servData.max_body_size)
@@ -476,7 +452,7 @@ void	TCPserver::setResponseFile(int i)
 		servData = server_data[portN];
 	}
 	
-	if (servData.root.back() != '/')
+	if (servData.root[servData.root.size() - 1] != '/')
 		servData.root += "/";
 	heading.http_status = "200";
 	if (isRedirect(heading,servData,i))
@@ -524,44 +500,44 @@ void	TCPserver::setResponseFile(int i)
 
 bool TCPserver::isDir(std::string &name)
 {
-    DIR *folder;
-    folder = opendir(name.c_str());
-    if(folder == NULL)
-    {
+	DIR *folder;
+	folder = opendir(name.c_str());
+	if(folder == NULL)
+	{
 		// std::cout << name << " aaaaaaaaaaaaaaaaaaaaaaa\n";
 		return false;
-    }
-	if (name.back() != '/')
+	}
+	if (name[name.size() - 1] != '/')
 		name += "/";
-    closedir(folder);
+	closedir(folder);
 	return true;
 }
 
 std::string TCPserver::listDir(std::string &name)
 {
-    DIR *folder;
-    struct dirent *entry;
+	DIR *folder;
+	struct dirent *entry;
 	// //std::cout << "//////////// " << name << "////////////" << std::endl; 
 	std::string htmlCode = "<!DOCTYPE html>\r\n"
 							"<html lang='en'>\r\n"
 							"<head>\r\n"
-    						"<meta charset='UTF-8'>\r\n"
-    						"<meta name='viewport' content='width=device-width, initial-scale=1.0'>\r\n"
-    						"<title>Directory listing</title>\r\n"
+							"<meta charset='UTF-8'>\r\n"
+							"<meta name='viewport' content='width=device-width, initial-scale=1.0'>\r\n"
+							"<title>Directory listing</title>\r\n"
 							"</head>\r\n"
 							"<body>\r\n"
 							"<ul>\r\n";
-    folder = opendir(name.c_str());
-    if(folder == NULL)
-    {
-        std::cerr << "Error occured" << std::endl;
+	folder = opendir(name.c_str());
+	if(folder == NULL)
+	{
+		std::cerr << "Error occured" << std::endl;
 		return std::string("not found");
-    }
-    while( (entry=readdir(folder)) )
-    {
-        htmlCode = htmlCode + "<li>" + entry->d_name + "</li>\r\n";
-    }
-    closedir(folder);
+	}
+	while( (entry=readdir(folder)) )
+	{
+		htmlCode = htmlCode + "<li>" + entry->d_name + "</li>\r\n";
+	}
+	closedir(folder);
 	htmlCode = htmlCode +  "</ul>\r\n" + "</body>\r\n" + "</html>\r\n";
 	return htmlCode;
 }
@@ -580,7 +556,7 @@ unsigned int TCPserver::url_lenght(std::string &str)
 {
 	size_t len = str.find('?');
 	if (len == std::string::npos)
-		return str.size();;
+		return str.size();
 	return (len);
 }
 

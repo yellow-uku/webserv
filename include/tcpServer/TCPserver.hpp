@@ -1,21 +1,27 @@
-# ifndef	TCP_SERVER_HPP	
-	# define	TCP_SERVER_HPP
+#ifndef TCP_SERVER_HPP
+# define TCP_SERVER_HPP
 
+# include <map>
+# include <bitset>
+# include <string>
+# include <vector>
+# include <sstream>
+# include <fstream>
+# include <iostream>
+# include <algorithm>
+
+# include <fcntl.h>
 # include <stdio.h>
+# include <unistd.h>
 # include <stdlib.h>
 # include <string.h>
+# include <unistd.h>
+# include <dirent.h>
+# include <sys/stat.h>
 # include <sys/types.h>
+# include <arpa/inet.h>
 # include <sys/socket.h>
 # include <netinet/in.h>
-# include <arpa/inet.h>
-# include <iostream>
-# include <unistd.h>
-# include <fstream>
-# include <fcntl.h>
-# include <sstream>
-# include <map>
-# include <vector>
-# include <dirent.h>
 
 # include "Server_utils.hpp"
 
@@ -29,8 +35,8 @@ class TCPserver
 		TCPserver(std::vector<struct Server_info>); //poxvelu a map
 		~TCPserver();
 
-		int				acceptclnt();
 		int				recvfully(int clnt);
+		void			acceptclnt();
 		void			sendResponse(int clnt);
 
 	private:
@@ -39,7 +45,7 @@ class TCPserver
 		void			setMethodToEnv(std::string);
 		void			createEnvForCGI(void);
 		void			mapToCharDblPtr();
-		void    		parseRequest(std::string &, int i);
+		void			parseRequest(std::string &, int i);
 		void			setUrl_and_Method(int i);
 		void			createSocketAndAddToSet(std::vector<struct Server_info> &);
 		void			createSocket(int port);
@@ -56,18 +62,17 @@ class TCPserver
 		bool			checkBodySize(std::string &fileName,Response_headers &heading, struct Server_info &servData,int i);
 		unsigned int	url_lenght(std::string &str); //<-
 		std::string		readLine(std::string &,size_t &);
-		std::string 	readFile(std::string filename);
+		std::string		readFile(std::string filename);
 		std::string		findFile(std::string);
 		std::string		getMethod();
 		std::string		getUrl();
 		std::string		gethttpvers();
 		std::string		find_and_set_cont_type(int i);
-		std::string 	correctIndexFile(std::string &,struct Server_info &servData);
-		std::string 	listDir(std::string &);	
+		std::string		correctIndexFile(std::string &,struct Server_info &servData);
+		std::string		listDir(std::string &);	
 		Server_info		correctInfos(struct Server_info &,std::string &);
 
-	private:
-		int									max_fd;
+	public:
 		char 								**myenv;
 		std::vector<int>					sock;
 		Response_headers					resp_head; //headers // <-
@@ -81,4 +86,4 @@ class TCPserver
 		fd_set								wr_undo;//yndhanur
 };
 
-# endif//	TCP_SERVER_HPP
+#endif // TCP_SERVER_HPP
