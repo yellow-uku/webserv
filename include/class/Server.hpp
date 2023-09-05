@@ -12,13 +12,18 @@
 # define DEFAULT_HOST ""
 # define DEFAULT_PORT "8080"
 # define DEFAULT_SERVER_NAME ""
-# define DEFAULT_MAX_BODY_SIZE 1000
+# define DEFAULT_MAX_BODY_SIZE 1000000 // 1M
 
 # define DEFAULT_403_PAGE "error_pages/403.html"
 # define DEFAULT_404_PAGE "error_pages/404.html"
 
 class Server
 {
+public:
+	typedef std::vector<listen_t>		listen_type;
+	typedef std::map<int, std::string>	error_page_type;
+	typedef std::vector<std::string>	server_name_type;
+
 private:
 
 	ssize_t								max_body_size;

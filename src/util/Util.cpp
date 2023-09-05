@@ -6,7 +6,13 @@ std::ostream& operator<<(std::ostream& os, const listen_t& ls)
 	return os;
 }
 
-bool listen_t::operator==(const listen_s& ls)
+std::ostream& operator<<(std::ostream& os, const socket_t& socket)
+{
+	os << socket.fd << ", host: " << socket.host << ", port: " << socket.port;
+	return os;
+}
+
+bool listen_t::operator==(const listen_s& ls) const
 {
 	return host == ls.host && port == ls.port;
 }
@@ -28,6 +34,29 @@ std::vector<std::string> splitIP(const std::string& line, int delim_count, char 
 		std::getline(ss, res, delim);
 
 		ret.push_back(res);
+	}
+
+	return ret;
+}
+
+std::string my_to_string(int num)
+{
+	size_t pos = 0;
+	std::string ret;
+
+	if (num == 0)
+		return ("0");
+
+	if (num < 0)
+	{
+		ret.insert(0, 1, '-');
+		++pos;
+	}
+
+	while (num)
+	{
+		ret.insert(pos, 1, (num % 10) + 48);
+		num /= 10;
 	}
 
 	return ret;

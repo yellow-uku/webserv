@@ -23,7 +23,6 @@ void ConfigParser::generateTokens(const std::string &file)
 {
 	std::vector<std::string> tokens;
 
-	std::cout << "\n";
 	for (size_t i = 0; i < file.size(); ++i)
 	{
 		std::string temp;
@@ -53,7 +52,6 @@ void ConfigParser::generateTokens(const std::string &file)
 	check_braces(tokens);
 
 	parseLocations(tokens);
-	std::cout << "\n";
 }
 
 void ConfigParser::check_braces(const std::vector<std::string> tokens)
@@ -96,6 +94,7 @@ void ConfigParser::init_locations(Location& location, const size_t& server_index
 		{
 			location.pushMethods("GET");
 			location.pushMethods("POST");
+			location.pushMethods("DELETE");
 		}
 	}
 }
@@ -203,12 +202,18 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 
 	setDefaults();
 
-	for (size_t i = 0; i < servers.size(); ++i)
-	{
-		std::cout << "\t\tSERVER " << i + 1 << "\n\n";
-		servers[i].print_everything();
-		std::cout << "\n\n";
-	}
+	// Someday
+	// for (std::vector<Server>::const_iterator it = servers.cbegin(); it != servers.cend(); ++it)
+	// {
+
+	// }
+
+	// for (size_t i = 0; i < servers.size(); ++i)
+	// {
+	// 	std::cout << "\t\tSERVER " << i + 1 << "\n\n";
+	// 	servers[i].print_everything();
+	// 	std::cout << "\n\n";
+	// }
 }
 
 ConfigParser::~ConfigParser() { }

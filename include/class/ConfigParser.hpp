@@ -31,7 +31,7 @@ public:
 	typedef LocationMap::iterator			location_iterator;
 	typedef	Hosts::iterator					host_iterator;
 
-protected:
+public:
 	Hosts hosts;
 	std::vector<Server> servers;
 

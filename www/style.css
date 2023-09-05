@@ -1,0 +1,274 @@
+*{
+	margin:0;
+	padding:0;
+	box-sizing:border-box;
+}
+i[class|="fa"]{
+	color: #434e60;
+	 margin:0 4px;
+}
+.main-div{
+	width:1200px;
+	margin:auto;
+	opacity: 0.8;
+}
+.header-1, .heading-2, .heading-3{
+	height: 360px;
+	width: 100%;
+	background-position-y: 50%;
+	position: relative;
+}
+.header-1{
+	background-image:url('./images/images/avatar-hat.jpg');
+	background-size:cover;	
+}
+.menu-div{
+	width: inherit;
+	display:flex;
+	justify-content: space-between;
+	padding:10px;
+	position: absolute;
+	z-index: 1;
+
+}
+.menu-div ul{
+	display: flex;	
+	list-style: none;
+}
+.menu-div li{
+	margin:0 10px;	
+}
+.menu-div a{
+	text-decoration: none;
+	color: grey;
+	font-size: 17px;
+}
+.heading-text-div{
+	display: flex;
+	z-index: 0;
+	justify-content: center;
+	align-items: center;
+	height: inherit;
+	width: inherit;
+	position:absolute;
+}
+.heading-text-div > p {
+	padding:8px 15px;
+	background-color: black;
+	color:white;
+	letter-spacing: 5px;
+	font-size: 18px;
+	font-style: sant-serif;
+}
+.content-1, .content-2, .content-3{
+	margin:auto;
+	width:955px;
+	margin-top:80px;
+}
+.intro-text{
+	text-align: center;
+}
+.intro-text > h2 {
+	margin-bottom:20px;
+}
+.intro-text > p{
+	text-align: left;
+	margin-top:15px;
+}
+.mid-content{
+	display: flex;
+	justify-content: space-between;
+	margin-top: 20px;
+}
+.mid-1, .mid-2{
+	width:50%;
+	margin:0 25px;
+}
+.mid-1{
+	text-align: center;
+}
+#img-avatar{
+	margin-top:40px;
+	width:100%;	
+}
+.mid-2{
+	line-height: 22px;
+}
+.skill-range{
+	height:100px;	
+}
+.skill-range > p{
+	letter-spacing: 5px;
+}
+.row{
+	color:white;
+	text-align: center;
+	background-color: gray;
+	margin-top:10px;
+}
+.filled{
+	background-color: black;
+	padding:7px;
+}
+.filled-1{
+	width:90%;
+}
+
+.filled-2{
+	width:85%;
+}
+
+.filled-3{
+	width:75%;
+}
+.statics{
+	display: flex;
+	justify-content: space-around;
+	background-color: black;
+	padding:30px;
+}
+.statics-divs{
+	color:white;
+	text-align: center;
+}
+.statics-divs > ul{
+	list-style: none;
+	scroll-padding-right: 20px;
+}
+
+.statics-divs li:first-child{
+	font-size: 20px;
+	padding-bottom: 5px;
+}
+.statics-divs li{
+	font-size: 14px;
+}
+.heading-2, .heading-3{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color:white;
+	font-size: 18px;
+	letter-spacing: 5px;
+}
+.heading-2{
+	background-image: url('./images/images/parallax2.jpg');
+}
+.content-2-imgs{
+	padding:25px;
+	margin-top:20px;
+}
+.container{
+	display: flex;
+	flex-wrap: wrap;
+	gap:20px;
+	position: relative;
+}
+.inners{
+	width:23%;	
+}
+.inners  img{
+	width: 100%;
+}
+.iner-img:active{
+	width: 28%;
+	position: absolute;
+}
+.button-container-div{
+	margin:auto;
+	text-align: center;
+	width:30%;
+}
+.button{
+	width:100px;
+	height: 40px;
+	border:0;
+}
+.button:hover{
+	cursor: pointer;
+}
+.heading-3{
+	margin-top: 60px;
+	background-image: url('./images/images/parallax3.jpg');
+}
+.footer-content{
+	margin-top:40px;
+}
+.inform-area{
+	display: flex;
+	gap:20px;
+}
+.for-map{
+	width:25%;
+}
+.for-map-1 > p{
+	margin:35px 0 0 15px;
+}
+.for-map > img{
+	width: 100%;
+}
+.fa-ul {
+	margin-top:10px;
+}
+.fa-ul > li{
+	padding:3px 0;
+}
+.user-data{
+	width:55%;
+	position: absolute;
+	right:0;
+	margin-top:15px;
+}
+.inputs{
+	height: 35px;
+	width:48%;
+	margin-bottom:5px;
+}
+.message{
+	width:100%;
+}
+.submit-button{
+	opacity:1;
+	padding:10px 15px;
+	color:white;
+	background-color: black;
+	> i {
+		color: white;
+	}
+	float:right;
+	right:0;
+}
+.submit-button:hover{
+	background-color: gray;
+	color:gold;
+	border-color: rgba(0,0,0,0);
+	> i {
+		color: #FFD700;
+	}
+}
+.content-3{
+	position: relative;
+	height: 390px;
+	padding-left:20px;
+}
+.footer{
+	height: 200px;
+	background-color: black;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	color:white;
+}
+.footer *{
+	margin-bottom:20px;
+}
+.footer > div > a > i{
+	margin:0;
+}
+.to-up-button{
+	padding:8px 15px;
+}
+.to-up-button:hover{
+	cursor: pointer;
+}

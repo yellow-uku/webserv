@@ -1,5 +1,5 @@
-# ifndef SERVER_UTILS_HPP
-	# define SERVER_UTILS_HPP
+#ifndef SERVER_UTILS_HPP
+# define SERVER_UTILS_HPP
 
 class Response_headers
 {
@@ -34,22 +34,16 @@ struct	Server_info
 {
 	int									port;
 	bool								autoindex;
-	std::string							server_name;
+	std::vector<std::string>			server_name;//ogtagorcac chi
 	std::string							root;
-	std::vector<std::string>			allow_methods;//ogtagorcac chi
+	std::vector<std::string>			allow_methods;
 	std::vector<std::string>			index_files;
-	std::map<short, std::string>		error_pages;
-	size_t 								max_body_size;
+	std::map<int, std::string>			error_pages;
+	unsigned int	 					max_body_size;
 	std::string	 						redirect; 
 	std::map<std::string, Server_info> 	location;
 	//cgi
 	//upload dir
-	//client_max_body_size
 };
-
-
-
-
-
 
 #endif// SERVER_UTILS_HPP

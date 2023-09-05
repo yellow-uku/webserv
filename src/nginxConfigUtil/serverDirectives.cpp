@@ -17,7 +17,6 @@ void ConfigParser::root(const std::vector<std::string>& tokens, size_t& server_i
 	i = count;
 }
 
-
 void ConfigParser::serverName(const std::vector<std::string>& tokens, size_t& server_index, size_t& location_level, size_t& i)
 {
 	if (location_level != 1)
@@ -51,7 +50,7 @@ void ConfigParser::listen(const std::vector<std::string>& tokens, size_t& server
 		std::string	port("8080");
 
 		validationOfListen(tokens[count], host, port);
-	
+
 		servers[server_index].pushListen(host, port);
 
 		++count;
