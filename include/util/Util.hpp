@@ -6,30 +6,33 @@
 # include <iostream>
 # include <algorithm>
 
-typedef struct listen_s
-{
-	std::string host;
-	std::string port;
+struct listen_t;
 
-	listen_s(): host(NULL), port("8080") {};
-	listen_s(const std::string& hst, const std::string& prt): host(hst), port(prt) {};
-	bool operator==(const listen_s& ls) const;
-
-} listen_t ;
-
-typedef struct socket
+struct socket_t
 {
 	int fd;
 	std::string host;
 	std::string port;
 
-	bool operator==(const socket& lhs) const { return host == lhs.host && port == lhs.port; }
-	bool operator==(const listen_t& lhs) const { return host == lhs.host && port == lhs.port; }
-	bool operator==(const int& socket) const { return fd == socket; }
+	bool operator==(const socket_t& lhs) const ;
+	bool operator==(const listen_t& lhs) const ;
+	bool operator==(const int& socket) const ;
 
-	socket(): fd(-1) { }
-	socket(const int& socket, const std::string& hst, const std::string& prt): fd(socket), host(hst), port(prt) { }
-} socket_t;
+	socket_t(): fd(-1) { }
+	socket_t(const int& socket, const std::string& hst, const std::string& prt): fd(socket), host(hst), port(prt) { }
+};
+
+struct listen_t
+{
+	std::string host;
+	std::string port;
+
+	listen_t(): host(NULL), port("8080") {};
+	listen_t(const std::string& hst, const std::string& prt): host(hst), port(prt) {};
+
+	bool operator==(const socket_t& socket) const ;
+	bool operator==(const listen_t& ls) const ;
+};
 
 std::ostream& operator<<(std::ostream& os, const listen_t& ls);
 std::ostream& operator<<(std::ostream& os, const socket_t& socket);

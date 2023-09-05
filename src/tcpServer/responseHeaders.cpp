@@ -1,6 +1,6 @@
 #include "TCPserver.hpp"
 
-Response_headers::Response_headers()
+ResponseHeaders::ResponseHeaders()
 {
 	http_versus	= "HTTP/1.1 ";
 	http_status	= "200 OK";
@@ -9,10 +9,10 @@ Response_headers::Response_headers()
 	backslash_r_n	= "\r\n";
 }
 
-Response_headers::~Response_headers()
+ResponseHeaders::~ResponseHeaders()
 {}
 
-void Response_headers::build_headers()
+void ResponseHeaders::build_headers()
 {
 	headers = http_versus + http_status + backslash_r_n 
 		+ "Connection: " + connection + backslash_r_n

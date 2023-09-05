@@ -1,12 +1,14 @@
 #include "TCPserver.hpp"
 
-void TCPserver::parseRequest(std::string &request, int client_socket)
+void TCPserver::parseRequest(int client_socket)
 {
 	size_t start = 0;
 
 	std::string key, value;
 
 	std::string line;
+
+	std::string request = clients[client_socket].allRequest;
 
 	clients[client_socket].reqstFirstline = readLine(request, start);
 
@@ -86,8 +88,8 @@ void TCPserver::setUrlAndMethod(int client_socket)
 		uri = " ";
 	}
 
-	if(url[0] == '/')
-		url.erase(0);
+	// if(url[0] == '/')
+	// 	url.erase(0, 1); why need this ?
 
 	clients[client_socket].method = method;
 	clients[client_socket].url = url;

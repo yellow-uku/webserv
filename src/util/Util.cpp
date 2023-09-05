@@ -12,11 +12,6 @@ std::ostream& operator<<(std::ostream& os, const socket_t& socket)
 	return os;
 }
 
-bool listen_t::operator==(const listen_s& ls) const
-{
-	return host == ls.host && port == ls.port;
-}
-
 bool NonDigit::operator()(char c)
 {
 	return !::isdigit(c);
@@ -79,3 +74,9 @@ int my_stoi(const std::string& s)
 
 	return res;
 }
+
+bool socket_t::operator==(const socket_t& lhs) const { return host == lhs.host && port == lhs.port; }
+bool socket_t::operator==(const listen_t& lhs) const { return host == lhs.host && port == lhs.port; }
+bool socket_t::operator==(const int& socket) const { return fd == socket; }
+bool listen_t::operator==(const socket_t& socket) const { return host == socket.host && port == socket.port; }
+bool listen_t::operator==(const listen_t& ls) const { return host == ls.host && port == ls.port; }

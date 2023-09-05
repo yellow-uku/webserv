@@ -1,12 +1,12 @@
 #ifndef SERVER_UTILS_HPP
 # define SERVER_UTILS_HPP
 
-class Response_headers
+class ResponseHeaders
 {
 	public:
 		void build_headers();
-		Response_headers();
-		~Response_headers();
+		ResponseHeaders();
+		~ResponseHeaders();
 
 	public:
 		std::string		http_versus;
@@ -17,7 +17,7 @@ class Response_headers
 		std::string		headers;
 };
 
-struct Client_info
+struct ClientInfo
 {
 	std::string							allRequest;
 	std::string 						requestBody;
@@ -30,20 +30,28 @@ struct Client_info
 	std::string							reqstFirstline;
 };
 
-struct	Server_info
+struct	ServerInfo
 {
 	int									port;
 	bool								autoindex;
-	std::vector<std::string>			server_name;//ogtagorcac chi
+	std::vector<std::string>			server_names;
 	std::string							root;
 	std::vector<std::string>			allow_methods;
 	std::vector<std::string>			index_files;
 	std::map<int, std::string>			error_pages;
 	unsigned int	 					max_body_size;
 	std::string	 						redirect; 
-	std::map<std::string, Server_info> 	location;
-	//cgi
-	//upload dir
+	std::map<std::string, ServerInfo> 	location;
+	std::string							cgi;
+	std::string							uploadDir;
+};
+
+struct server_t {
+	ServerInfo					info;
+	Server::listen_type			listens;
+	std::vector<std::string>	server_names;
+
+	bool operator==(const socket_t& socket) const { return std::find(listens.begin(), listens.end(), socket) != listens.end(); }
 };
 
 #endif// SERVER_UTILS_HPP

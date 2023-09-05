@@ -1,8 +1,8 @@
 #include "TCPserver.hpp"
 
-struct Server_info init_serv_infos_struct(int port)
+struct ServerInfo init_serv_infos_struct(int port)
 {
-	struct Server_info data;
+	struct ServerInfo data;
 	data.port = port;
 	data.root = "./";
 	data.index_files.push_back("index.html");

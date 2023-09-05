@@ -3,7 +3,6 @@
 int TCPserver::recvfully(int clnt)
 {
 	int bytes = 0;
-	std::string rt = "";
 
 	char buf[MAX_BUF + 1];
 
@@ -18,19 +17,20 @@ int TCPserver::recvfully(int clnt)
 	buf[bytes] = 0;
 
 	clients[clnt].allRequest = buf;
-	parseRequest(rt, clnt);
+	parseRequest(clnt);
+
 	return 1;
 }
 
-// void	TCPserver::sendResponse(int clnt)
-// {
-// 	// std::cout << "resp - >" << clients[clnt].response.c_str() << std::endl;
-// 	if (send(clnt, clients[clnt].response.c_str(), clients[clnt].response.size(), 0) < 0)
-// 	{
-// 		std::cerr << "Send() failed" << std::endl;
-// 		exit (0); // NEED TO CHANGE!!!! 
-// 	}
-// }
+void	TCPserver::sendResponse(int clnt)
+{
+	// std::cout << "resp - >" << clients[clnt].response.c_str() << std::endl;
+	if (send(clnt, clients[clnt].response.c_str(), clients[clnt].response.size(), 0) < 0)
+	{
+		std::cerr << "Send() failed" << std::endl;
+		exit (0); // NEED TO CHANGE!!!! 
+	}
+}
 
 std::string TCPserver::readFile(std::string filename)
 {
