@@ -174,9 +174,6 @@ void	TCPserver::setResponseFile(int client_socket, const socket_t& listen)
 	else
 		servData = info;
 
-	if (servData.root[servData.root.size() - 1] != '/')
-		servData.root += "/";
-
 	heading.http_status = "200";
 
 	if (isRedirect(heading,servData,client_socket))
@@ -187,13 +184,12 @@ void	TCPserver::setResponseFile(int client_socket, const socket_t& listen)
 	if (!checkMethod(fileName, heading, servData, client_socket) || checkBodySize(fileName, heading, servData, client_socket))
 	{
 		buildResponse(fileName, heading, 0, client_socket);
+		return ;
 	}
-	else if (isDir(fileName))
+	if (isDir(fileName))
 	{
-		std::cout << fileName << " name\n";
 		if (checkDir(fileName, heading, servData))
 		{
-			std::cout << "what?\n";
 			buildResponse(fileName, heading, 0, client_socket);
 			return;
 		}
@@ -202,12 +198,10 @@ void	TCPserver::setResponseFile(int client_socket, const socket_t& listen)
 			if (thereIsNoIndexFile(servData))
 			{
 				fileName = "";
-				std::cout << "no index\n";
 			}
 			else
 			{
 				fileName = correctIndexFile(fileName,servData);
-				std::cout << "found index\n";
 			}
 		}
 		else
@@ -238,7 +232,7 @@ std::string	TCPserver::find_and_set_cont_type(int i)
 	return (std::string("text/html"));
 }
 
-bool	TCPserver::thereIsNoIndexFile(ServerInfo &servData)
+bool TCPserver::thereIsNoIndexFile(ServerInfo &servData)
 {
 	return servData.index_files.size() == 0;
 }
@@ -256,7 +250,7 @@ std::string TCPserver::correctIndexFile(std::string &fileName, ServerInfo &servD
 	return servData.root + "/" + servData.error_pages[404];
 }
 
-bool	TCPserver::isLocation(ServerInfo &info, std::string &name)
+bool TCPserver::isLocation(ServerInfo &info, std::string &name)
 {
 	return info.location.count(name);
 }

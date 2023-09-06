@@ -27,7 +27,13 @@ void Location::pushMethods(const std::string& method)
 
 void Location::setCgi(const std::string& cgi) { _cgi = cgi; }
 
-void Location::setRoot(const std::string& root) { _root = root[0] == '/' ? root : DEFAULT_ROOT + root; }
+void Location::setRoot(const std::string& root)
+{
+	_root = root[0] == '/' ? root : DEFAULT_ROOT + root;
+
+	if (_root[_root.size() - 1] != '/')
+		_root += '/';
+}
 
 void Location::setAutoindex(const std::string& autoindex) { _autoindex = autoindex; }
 

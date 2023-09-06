@@ -20,6 +20,9 @@ void Server::setMaxBodySize(ssize_t l) { max_body_size = l; }
 void Server::setRoot(const std::string& rt)
 {
 	root = (rt[0] == '/' ? rt : DEFAULT_ROOT + rt);
+
+	if (root[root.size() - 1] != '/')
+		root += '/';
 }
 
 void Server::pushServerName(const std::string& server_name)
