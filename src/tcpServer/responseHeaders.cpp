@@ -9,8 +9,7 @@ ResponseHeaders::ResponseHeaders()
 	backslash_r_n	= "\r\n";
 }
 
-ResponseHeaders::~ResponseHeaders()
-{}
+ResponseHeaders::~ResponseHeaders() { }
 
 void ResponseHeaders::build_headers()
 {

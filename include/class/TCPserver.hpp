@@ -59,7 +59,7 @@ private:
 	bool			checkDir(std::string &dirName, ResponseHeaders & heading, ServerInfo &servData);
 	bool			checkMethod(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
 	bool			checkBodySize(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
-	unsigned int	urlLength(std::string &str); //<-
+	size_t	urlLength(std::string &str); //<-
 	std::string		readLine(std::string &str, size_t &start);
 	std::string		readFile(std::string filename);
 	std::string		findFile(std::string filename);

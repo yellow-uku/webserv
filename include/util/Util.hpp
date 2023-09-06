@@ -14,9 +14,10 @@ struct socket_t
 	std::string host;
 	std::string port;
 
+	bool operator==(const int& socket) const ;
 	bool operator==(const socket_t& lhs) const ;
 	bool operator==(const listen_t& lhs) const ;
-	bool operator==(const int& socket) const ;
+	bool operator==(const std::string& lhs) const ;
 
 	socket_t(): fd(-1) { }
 	socket_t(const int& socket, const std::string& hst, const std::string& prt): fd(socket), host(hst), port(prt) { }

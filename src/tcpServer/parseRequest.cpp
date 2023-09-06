@@ -98,5 +98,14 @@ void TCPserver::setUrlAndMethod(int client_socket)
 	std::cout << "method->" << method << std::endl;
 	std::cout << "url->" << url << std::endl;
 	std::cout << "uri->" << uri << std::endl;
-	
+}
+
+size_t TCPserver::urlLength(std::string &str)
+{
+	size_t len = str.find('?');
+
+	if (len == std::string::npos)
+		return str.size();
+
+	return (len);
 }

@@ -30,8 +30,10 @@ TCPserver::TCPserver(const Config& conf)
 		{
 			servinfo.info.location[it->first].error_pages = serv.getErrorPages();
 			servinfo.info.location[it->first].max_body_size = serv.getMaxBodySize();
+
 			servinfo.info.location[it->first].allow_methods = (it->second).getArrayOf("allow_methods");
 			servinfo.info.location[it->first].index_files = (it->second).getArrayOf("index");
+
 			servinfo.info.location[it->first].root = (it->second).getValueOf("root");
 			servinfo.info.location[it->first].autoindex = ((it->second).getValueOf("autoindex") == "on");
 			servinfo.info.location[it->first].cgi = (it->second).getValueOf("cgi");
@@ -42,8 +44,6 @@ TCPserver::TCPserver(const Config& conf)
 	}
 
 	getSockets(conf);
-
-	// createSocketAndAddToSet();
 }
 
 void TCPserver::init_sets(fd_set& main_read, fd_set& main_write)
@@ -140,6 +140,7 @@ void TCPserver::server_loop()
 						break ;
 					}
 					std::cout << clients[i].allRequest << "\n";
+
 					setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
 					FD_SET(i, &main_write);
 					FD_CLR(i, &main_read);
@@ -156,62 +157,6 @@ void TCPserver::server_loop()
 			}
 		}
 	}
-}
-
-void	TCPserver::setResponseFile(int client_socket, const socket_t& listen)
-{
-	ServerInfo			servData;
-	std::string			fileName;
-	std::string			response;
-	ResponseHeaders		heading;
-
-	ServerInfo& info = std::find(serverData.begin(), serverData.end(), listen)->info;
-
-	if (isLocation(info, clients[client_socket].url))
-	{
-		servData = correctInfos(info, clients[client_socket].url);
-	}
-	else
-		servData = info;
-
-	heading.http_status = "200";
-
-	if (isRedirect(heading,servData,client_socket))
-		return ;
-
-	fileName = servData.root + clients[client_socket].url;
-
-	if (!checkMethod(fileName, heading, servData, client_socket) || checkBodySize(fileName, heading, servData, client_socket))
-	{
-		buildResponse(fileName, heading, 0, client_socket);
-		return ;
-	}
-	if (isDir(fileName))
-	{
-		if (checkDir(fileName, heading, servData))
-		{
-			buildResponse(fileName, heading, 0, client_socket);
-			return;
-		}
-		if (!servData.autoindex)
-		{
-			if (thereIsNoIndexFile(servData))
-			{
-				fileName = "";
-			}
-			else
-			{
-				fileName = correctIndexFile(fileName,servData);
-			}
-		}
-		else
-		{
-			buildResponse(fileName,heading, 1, client_socket);
-			return ;
-		}
-	}
-	checkFile(fileName, heading, servData);// body,methods 
-	buildResponse(fileName, heading, 0, client_socket);
 }
 
 /*
@@ -232,11 +177,6 @@ std::string	TCPserver::find_and_set_cont_type(int i)
 	return (std::string("text/html"));
 }
 
-bool TCPserver::thereIsNoIndexFile(ServerInfo &servData)
-{
-	return servData.index_files.size() == 0;
-}
-
 std::string TCPserver::correctIndexFile(std::string &fileName, ServerInfo &servData)
 {
 	std::string full_path;
@@ -248,101 +188,6 @@ std::string TCPserver::correctIndexFile(std::string &fileName, ServerInfo &servD
 	}
 
 	return servData.root + "/" + servData.error_pages[404];
-}
-
-bool TCPserver::isLocation(ServerInfo &info, std::string &name)
-{
-	return info.location.count(name);
-}
-
-ServerInfo TCPserver::correctInfos(ServerInfo &info, std::string &name)
-{
-	std::cout << name << " name\n";
-	return info.location[name];
-}
-
-bool TCPserver::isRedirect(ResponseHeaders &headData, ServerInfo &servData, int i)//poxel prototype
-{
-	if (servData.redirect[0] == '/')
-		servData.redirect.erase(0, 1);
-
-	if(!servData.redirect.size() || clients[i].url == servData.redirect)
-		return false;
-
-	(void) headData;
-
-	clients[i].response = "HTTP/1.1 307 Temporary Redirect\r\n"
-	"HTTP/1.1 307 Temporary Redirect\r\n"
-	"Location: " + servData.redirect +"\r\n"
-	"Content-Length: 0\r\n"
-	"Connection: close\r\n"
-	"Content-Type: text/html; charset=UTF-8\r\n"
-	"\r\n";
-
-	return true;
-}
-
-void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, bool dir, int client_socket)
-{
-	std::string response;
-	std::string headers;
-	
-	if (!dir)
-	{
-		heading.content_type = find_and_set_cont_type(client_socket);
-		heading.build_headers();
-		headers = heading.headers;
-		response = headers;
-		response += readFile(fileName);
-		clients[client_socket].full_path = fileName;
-		clients[client_socket].response = response;
-	}
-	else
-	{
-		heading.build_headers();
-		headers = heading.headers;
-		response = headers;
-		response += listDir(fileName);
-		clients[client_socket].response = response;
-		clients[client_socket].full_path = fileName;
-	}
-}
-
-bool TCPserver::checkMethod(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket)
-{
-	for (size_t i = 0; i < servData.allow_methods.size(); ++i)
-	{
-		if (servData.allow_methods[i] == clients[client_socket].method)
-			return true;
-	}
-
-	// std::cout << servData.allow_methods[0] << " " << clients[client_socket].method << "\n";
-
-	heading.http_status = "405";
-	fileName = servData.root + "/" + servData.error_pages[405];
-	return false;
-}
-
-bool TCPserver::checkBodySize(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket)
-{	
-	if (servData.max_body_size != 0 && clients[client_socket].requestBody.size() > servData.max_body_size)
-	{
-		heading.http_status = "413";
-		fileName = servData.root + "/" + servData.error_pages[413];
-
-		return true;
-	}
-	return false;
-}
-
-unsigned int TCPserver::urlLength(std::string &str)
-{
-	size_t len = str.find('?');
-
-	if (len == std::string::npos)
-		return str.size();
-
-	return (len);
 }
 
 TCPserver::~TCPserver(){

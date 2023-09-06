@@ -34,12 +34,12 @@ struct	ServerInfo
 {
 	int									port;
 	bool								autoindex;
+	size_t	 							max_body_size;
 	std::vector<std::string>			server_names;
 	std::string							root;
 	std::vector<std::string>			allow_methods;
 	std::vector<std::string>			index_files;
 	std::map<int, std::string>			error_pages;
-	unsigned int	 					max_body_size;
 	std::string	 						redirect; 
 	std::map<std::string, ServerInfo> 	location;
 	std::string							cgi;
