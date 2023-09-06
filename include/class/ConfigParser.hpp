@@ -31,6 +31,9 @@ public:
 	typedef LocationMap::iterator			location_iterator;
 	typedef	Hosts::iterator					host_iterator;
 
+private:
+	std::string file_path;
+
 public:
 	Hosts hosts;
 	std::vector<Server> servers;
@@ -40,7 +43,7 @@ private:
 	static char const * const array_value_directives_location[];
 	static char const * const single_value_directives_location[];
 
-	bool contains(char const * const allowed_tokens[], const std::string& token);
+	bool	contains(char const * const allowed_tokens[], const std::string& token);
 
 private:
 	void	getHosts();
@@ -75,7 +78,8 @@ private:
 public:
 	ConfigParser(const std::string &file_path);
 
-	void	parse(const std::string& file_path);
+	void	print();
+	void	parse();
 
 	~ConfigParser();
 };

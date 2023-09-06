@@ -56,8 +56,8 @@ public:
 	template <typename T>
 	void printVectors(const std::vector<T>& vec);
 
-	bool operator==(const std::string& serverName);
-	bool operator==(const listen_t& lst);
+	bool operator==(const std::string& serverName) const ;
+	bool operator==(const listen_t& lst) const ;
 
 public:
 	std::map<std::string, Location>		locations;

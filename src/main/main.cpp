@@ -14,40 +14,26 @@ int main(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
+
 	Config conf(DEFAULT_FILE_PATH);
 
-	// std::vector<struct Server_info> data;
+	try
+	{
+		conf.parse();
 
-	// if (argc < 2)
-	// {
-	// 	std::cerr << "Wrong argument count" << std::endl;
-	// 	return (1);
-	// }
+		// conf.print();
 
-	// for(int i = 1; i < argc; i++)
-	// {
-	// 	data.push_back(init_serv_infos_struct(atoi(argv[i])));
-	// }
+		TCPserver socket(conf);
 
-	TCPserver socket(conf);
+		socket.server_loop();
 
-	socket.server_loop();
-
-	// std::cout << socket.preEnv["123123"] << "\n";
-
-	// for (std::map<std::string, std::string>::iterator i = socket.preEnv.begin(); i != socket.preEnv.end(); i++)
-	// {
-	// 	std::cout << i->first << "\n";
-	// }
+		return 0;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
 	
-	// for (size_t i = 0; socket.myenv[i]; ++i)
-	// {
-	// 	std::cout << socket.myenv[i] << "\n";
-	// }
-	
-	// socket.server_loop();
-
-	return 0;
 }
 // #include "webserv.hpp"
 

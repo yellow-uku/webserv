@@ -69,12 +69,12 @@ void Server::print_everything()
 	}
 }
 
-bool Server::operator==(const std::string& serverName)
+bool Server::operator==(const std::string& serverName) const
 {
 	return std::find(server_names.begin(), server_names.end(), serverName) != server_names.end();
 }
 
-bool Server::operator==(const listen_t& lst)
+bool Server::operator==(const listen_t& lst) const
 {
 	return std::find(listen.begin(), listen.end(), lst) != listen.end();
 }

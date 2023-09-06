@@ -1,8 +1,8 @@
 #include "ConfigParser.hpp"
 
-ConfigParser::ConfigParser(const std::string &file_path) : servers(std::vector<Server>()) { parse(file_path); }
+ConfigParser::ConfigParser(const std::string &file) : file_path(file), servers(std::vector<Server>()) { }
 
-void ConfigParser::parse(const std::string &file_path)
+void ConfigParser::parse()
 {
 	std::ifstream conf(file_path.c_str());
 	std::stringstream sstream;
@@ -202,18 +202,29 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 
 	setDefaults();
 
-	// Someday
-	// for (std::vector<Server>::const_iterator it = servers.cbegin(); it != servers.cend(); ++it)
-	// {
+	for (std::vector<Server>::const_iterator it = servers.cbegin(); it != servers.cend(); ++it)
+	{
+		const std::vector<std::string> names = it->getServerNames();
+	
+		for (size_t j = 0; j < names.size(); ++j)
+		{
+			for (std::vector<Server>::const_iterator it2 = it + 1; it2 != servers.cend(); ++it2)
+			{
+				if (names[j] != "" && std::find(it2, servers.cend(), names[j]) != servers.cend())
+					throw std::runtime_error("Duplicate server name: " + names[j]);
+			}
+		}
+	}
 
-	// }
-
-	// for (size_t i = 0; i < servers.size(); ++i)
-	// {
-	// 	std::cout << "\t\tSERVER " << i + 1 << "\n\n";
-	// 	servers[i].print_everything();
-	// 	std::cout << "\n\n";
-	// }
+}
+void ConfigParser::print()
+{
+	for (size_t i = 0; i < servers.size(); ++i)
+	{
+		std::cout << "\t\tSERVER " << i + 1 << "\n\n";
+		servers[i].print_everything();
+		std::cout << "\n\n";
+	}
 }
 
 ConfigParser::~ConfigParser() { }

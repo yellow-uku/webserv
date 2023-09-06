@@ -120,6 +120,8 @@ void TCPserver::server_loop()
 					if (clnt > max_fd)
 						max_fd = clnt;
 
+					std::cout << ntohs(clntAddr.sin_port) << "\n";
+
 					allFd.push_back(socket_t(clnt, it->host, it->port));
 
 					FD_SET(clnt, &main_read);
@@ -139,6 +141,7 @@ void TCPserver::server_loop()
 						std::cout << "ret <= 0\n";
 						break ;
 					}
+
 					std::cout << clients[i].allRequest << "\n";
 
 					setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
