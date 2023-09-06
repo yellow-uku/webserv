@@ -120,8 +120,6 @@ void TCPserver::server_loop()
 					if (clnt > max_fd)
 						max_fd = clnt;
 
-					std::cout << ntohs(clntAddr.sin_port) << "\n";
-
 					allFd.push_back(socket_t(clnt, it->host, it->port));
 
 					FD_SET(clnt, &main_read);
@@ -169,11 +167,11 @@ void TCPserver::server_loop()
 	"\r\n"
 */
 
-std::string	TCPserver::find_and_set_cont_type(int i)
+std::string	TCPserver::find_and_set_cont_type(int client_socket)
 {
-	if (clients[i].url.find(".css") != std::string::npos)
+	if (clients[client_socket].url.find(".css") != std::string::npos)
 		return (std::string("text/css"));
-	else if (clients[i].url.find(".jpg") != std::string::npos)
+	else if (clients[client_socket].url.find(".jpg") != std::string::npos)
 		return (std::string("image/jpeg"));
 
 	//typeri checky avelacnel

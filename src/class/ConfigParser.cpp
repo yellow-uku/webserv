@@ -49,6 +49,10 @@ void ConfigParser::generateTokens(const std::string &file)
 		if (file[i] == ';' || file[i] == '{' || file[i] == '}')
 			tokens.push_back(std::string(1, file[i]));
 	}
+
+	if (tokens.size() == 0)
+		throw std::runtime_error("Error: Empty file");
+
 	check_braces(tokens);
 
 	parseLocations(tokens);
@@ -65,12 +69,12 @@ void ConfigParser::check_braces(const std::vector<std::string> tokens)
 		else if (tokens[i] == "}")
 		{
 			if (br.size() == 0)
-				throw std::runtime_error("wrong braces");
+				throw std::runtime_error("Error: Wrong braces");
 			br.pop();
 		}
 	}
 	if (br.size() != 0)
-		throw std::runtime_error("wrong braces");
+		throw std::runtime_error("Error: Wrong braces");
 }
 
 void ConfigParser::init_locations(Location& location, const size_t& server_index)
@@ -215,8 +219,8 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 			}
 		}
 	}
-
 }
+
 void ConfigParser::print()
 {
 	for (size_t i = 0; i < servers.size(); ++i)
