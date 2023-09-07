@@ -25,11 +25,11 @@ class ConfigParser
 
 {
 public:
-	typedef	std::map<std::string, std::string> Hosts;
+	typedef	std::map<std::string, std::string>	Hosts;
 
-	typedef std::vector<Server>::iterator	iterator;
-	typedef LocationMap::iterator			location_iterator;
-	typedef	Hosts::iterator					host_iterator;
+	typedef std::vector<Server>::iterator		iterator;
+	typedef LocationMap::iterator				location_iterator;
+	typedef	Hosts::iterator						host_iterator;
 
 private:
 	std::string file_path;
@@ -39,9 +39,11 @@ public:
 	std::vector<Server> servers;
 
 private:
-	static char const * const allowed_methods[];
-	static char const * const array_value_directives_location[];
-	static char const * const single_value_directives_location[];
+	static const int			error_page_numbers[];
+	static char const * const	error_pages[];
+	static char const * const	allowed_methods[];
+	static char const * const	array_value_directives_location[];
+	static char const * const	single_value_directives_location[];
 
 	bool	contains(char const * const allowed_tokens[], const std::string& token);
 

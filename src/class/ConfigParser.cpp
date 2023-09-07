@@ -107,14 +107,19 @@ void ConfigParser::setDefaults()
 {
 	for (size_t i = 0; i < servers.size(); ++i)
 	{
+		std::map<int, std::string> err_pages = servers[i].getErrorPages();
+
+		for (size_t j = 0; error_page_numbers[j]; ++j)
+		{
+			if (err_pages.find(error_page_numbers[j]) == err_pages.end())
+			{
+				servers[i].pushErrorPage(error_page_numbers[j], error_pages[j]);
+			}
+		}
+
 		if (servers[i].getRoot() == "")
 		{
 			servers[i].setRoot(DEFAULT_ROOT);
-		}
-		if (servers[i].getErrorPages().size() == 0)
-		{
-			servers[i].pushErrorPage(403, DEFAULT_403_PAGE);
-			servers[i].pushErrorPage(404, DEFAULT_404_PAGE);
 		}
 		if (servers[i].getServerNames().size() == 0)
 		{

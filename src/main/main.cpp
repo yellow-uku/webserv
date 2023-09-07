@@ -1,27 +1,17 @@
 #include "TCPserver.hpp"
 
-struct ServerInfo init_serv_infos_struct(int port)
-{
-	struct ServerInfo data;
-	data.port = port;
-	data.root = "./";
-	data.index_files.push_back("index.html");
-
-	return (data);
-}
-
 int main(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
 
-	Config conf(DEFAULT_FILE_PATH);
+	Config conf(argc > 1 ? argv[1] : DEFAULT_FILE_PATH);
 
 	try
 	{
 		conf.parse();
 
-		// conf.print();
+		conf.print();
 
 		TCPserver socket(conf);
 
