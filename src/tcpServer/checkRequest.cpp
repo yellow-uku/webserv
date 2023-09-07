@@ -55,8 +55,3 @@ ServerInfo TCPserver::correctInfos(ServerInfo &info, std::string &name)
 {
 	return info.location[name];
 }
-
-bool TCPserver::thereIsNoIndexFile(ServerInfo &servData)
-{
-	return servData.index_files.size() == 0;
-}
