@@ -72,7 +72,6 @@ int TCPserver::createSocket(const char *name, const char *port)
 		temp = temp->ai_next;
 	}
 
-
 	if (!temp)
 	{
 		freeaddrinfo(list);

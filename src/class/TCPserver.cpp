@@ -181,6 +181,7 @@ std::string	TCPserver::find_and_set_cont_type(int client_socket)
 std::string TCPserver::correctIndexFile(std::string &fileName, ServerInfo &servData)
 {
 	std::string full_path;
+
 	for (std::vector<std::string>::iterator it = servData.index_files.begin(); it < servData.index_files.end(); ++it)
 	{
 		full_path = fileName + *it;
@@ -188,7 +189,7 @@ std::string TCPserver::correctIndexFile(std::string &fileName, ServerInfo &servD
 			return full_path;
 	}
 
-	return servData.root + "/" + servData.error_pages[404];
+	return servData.root + "/" + servData.error_pages[403];
 }
 
 TCPserver::~TCPserver(){

@@ -9,7 +9,7 @@ class ResponseHeaders
 		~ResponseHeaders();
 
 	public:
-		std::string		http_versus;
+		std::string		http_version;
 		std::string		http_status;
 		std::string		connection;
 		std::string		content_type;

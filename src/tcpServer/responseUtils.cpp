@@ -9,12 +9,7 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& listen)
 
 	ServerInfo& info = (std::find(serverData.begin(), serverData.end(), listen))->info;
 
-	if (isLocation(info, clients[client_socket].url))
-	{
-		servData = correctInfos(info, clients[client_socket].url);
-	}
-	else
-		servData = info;
+	servData = (isLocation(info, clients[client_socket].url) ? correctInfos(info, clients[client_socket].url) : info);
 
 	heading.http_status = "200";
 
@@ -37,18 +32,11 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& listen)
 		}
 		if (!servData.autoindex)
 		{
-			if (thereIsNoIndexFile(servData))
-			{
-				fileName = "";
-			}
-			else
-			{
-				fileName = correctIndexFile(fileName,servData);
-			}
+			fileName = correctIndexFile(fileName, servData);
 		}
 		else
 		{
-			buildResponse(fileName,heading, 1, client_socket);
+			buildResponse(fileName, heading, 1, client_socket);
 			return ;
 		}
 	}
