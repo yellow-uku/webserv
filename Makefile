@@ -5,6 +5,7 @@ MODULES		= $(shell cd src && find * -type d)
 SDIR		= src/
 ODIR		= obj/
 INCDIR		= include/
+OBJDIR_NAME	= obj/
 SRCDIR		= $(addprefix $(SDIR), $(MODULES))
 OBJDIR		= $(addprefix $(ODIR), $(MODULES))
 
@@ -21,14 +22,14 @@ vpath %.cpp $(SRCDIR)
 define compile
 $1/%.o: %.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $$< -o $$@
-endef 
+endef
 
 $(foreach dir, $(OBJDIR), $(eval $(call compile, $(dir))))
 
 all: mkdir $(NAME)
 
 mkdir:
-	@mkdir -p $(OBJDIR)
+	@if [ ! -d "$(OBJDIR_NAME)" ]; then mkdir -p $(OBJDIR) ; fi
 
 $(NAME): $(OBJS)
 	$(CXX) $(OBJS) $(CXXFLAGS) -o $(NAME)

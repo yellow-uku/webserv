@@ -160,13 +160,6 @@ void TCPserver::server_loop()
 	}
 }
 
-/*
-  	HTTP/1.1 200 OK\r\n"
-	"Connection: Close\r\n"
-	"Content-Type: text/css\r\n"
-	"\r\n"
-*/
-
 std::string	TCPserver::find_and_set_cont_type(int client_socket)
 {
 	if (clients[client_socket].url.find(".css") != std::string::npos)
@@ -192,6 +185,4 @@ std::string TCPserver::correctIndexFile(std::string &fileName, ServerInfo &servD
 	return servData.root + "/" + servData.error_pages[403];
 }
 
-TCPserver::~TCPserver(){
-	// std::cout << *(char *)nullptr;
-}
+TCPserver::~TCPserver() { }
