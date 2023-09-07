@@ -15,7 +15,7 @@ void TCPserver::getSockets(const Config& conf)
 				std::string host = listens[j].host;
 				std::string port = listens[j].port;
 
-				sockets.push_back(socket_t(createSocket(host == "" ? NULL : host.c_str(), port.c_str()), host, port));
+				sockets.push_back(socket_t(createSocket((host == "" ? NULL : host.c_str()), port.c_str()), host, port));
 			}
 		}
 	}
@@ -23,8 +23,6 @@ void TCPserver::getSockets(const Config& conf)
 
 int TCPserver::createSocket(const char *name, const char *port)
 {
-	int fd;
-	int status;
 	int yes = 1;
 	struct addrinfo hints;
 	struct addrinfo *list;
@@ -32,34 +30,53 @@ int TCPserver::createSocket(const char *name, const char *port)
 	memset(&hints, 0, sizeof hints);
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_family = AF_INET;
+	hints.ai_family = AF_UNSPEC;
 
-	status = getaddrinfo(name, port, &hints, &list);
+	int status = getaddrinfo(name, port, &hints, &list);
 
 	if (status != 0 || list == NULL)
 		throw std::runtime_error(std::string("Error getting addrinfo: ") + gai_strerror(status));
 
-	fd = socket(list->ai_family, list->ai_socktype, list->ai_protocol);
+	int fd;
+	int bind_errno = 0;
 
-	if (fd < 0)
+	struct addrinfo *temp = list;
+
+	while (temp)
 	{
-		perror("socket");
-		throw std::runtime_error("socket error");
+		fd = socket(temp->ai_family, temp->ai_socktype, temp->ai_protocol);
+
+		if (fd < 0)
+		{
+			perror("socket");
+			throw std::runtime_error("Socket error");
+		}
+
+		fcntl(fd, F_SETFL, O_NONBLOCK);
+		setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes);
+
+		if (bind(fd, temp->ai_addr, temp->ai_addrlen) == 0)
+		{
+			if (listen(fd, 500) < 0)
+			{
+				perror("listen");
+				freeaddrinfo(list);
+				throw std::runtime_error("Listen error");
+			}
+
+			break ;
+		}
+
+		bind_errno = errno;
+
+		temp = temp->ai_next;
 	}
 
-	fcntl(fd, F_SETFL, O_NONBLOCK);
-	setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes);
 
-	if (bind(fd, list->ai_addr, list->ai_addrlen))
+	if (!temp)
 	{
-		perror("bind");
-		throw std::runtime_error("bind error");
-	}
-
-	if (listen(fd, 500) < 0)
-	{
-		perror("listen");
-		throw std::runtime_error("listen error");
+		freeaddrinfo(list);
+		throw std::runtime_error(std::string("Bind error: ") + strerror(bind_errno));
 	}
 
 	freeaddrinfo(list);

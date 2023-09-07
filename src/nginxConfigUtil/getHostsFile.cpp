@@ -37,4 +37,5 @@ void ConfigParser::getHosts()
 		getHostValues(line, key, value);
 		hosts.insert(std::make_pair(value, key));
 	}
+	hosts["localhost"] = "::1";
 }

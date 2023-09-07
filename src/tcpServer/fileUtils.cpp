@@ -26,7 +26,7 @@ bool TCPserver::checkDir(std::string &dirName, ResponseHeaders &heading, ServerI
 	size_t len, start = 1;
 	bool 	forwhile = true;
 	std::string dName;
-	
+
 	// while(forwhile)
 	// {
 	// 	len = dirName.find("/",start);

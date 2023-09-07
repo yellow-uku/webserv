@@ -89,7 +89,7 @@ void TCPserver::server_loop()
 
 	init_sets(main_read, main_write);
 
-	while(true)
+	while(1)
 	{
 		read = main_read;
 		write = main_write;
@@ -170,12 +170,12 @@ void TCPserver::server_loop()
 std::string	TCPserver::find_and_set_cont_type(int client_socket)
 {
 	if (clients[client_socket].url.find(".css") != std::string::npos)
-		return (std::string("text/css"));
+		return ("text/css");
 	else if (clients[client_socket].url.find(".jpg") != std::string::npos)
-		return (std::string("image/jpeg"));
+		return ("image/jpeg");
 
 	//typeri checky avelacnel
-	return (std::string("text/html"));
+	return ("text/html");
 }
 
 std::string TCPserver::correctIndexFile(std::string &fileName, ServerInfo &servData)

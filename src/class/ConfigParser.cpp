@@ -146,7 +146,7 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 	for (size_t i = 0; i < tokens.size(); ++i)
 	{
 		if (location_level == 0 && tokens[i] != "server")
-			throw std::runtime_error("expected server block, found " + tokens[i]);
+			throw std::runtime_error("Error: Expected server block, found " + tokens[i]);
 
 		if (tokens[i] == "server")
 		{
@@ -156,7 +156,7 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 			++i;
 
 			if (i == tokens.size() || tokens[i] != "{")
-				throw std::runtime_error("invalid file");
+				throw std::runtime_error("Error: Invalid file");
 		}
 		else if (tokens[i] == "server_name")
 			serverName(tokens, server_index, location_level, i);
@@ -182,11 +182,11 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 		else if (tokens[i] == "location")
 		{
 			if (tokens[i + 1] == "{" || tokens[i + 2] != "{")
-				throw std::runtime_error("invalid location directive");
+				throw std::runtime_error("Error: Invalid location directive");
 			storeLocation(tokens, current_location, location_level, server_index, i);
 		}
 		else if (tokens[i] != "}")
-			throw std::runtime_error("invalid directive: " + tokens[i]);
+			throw std::runtime_error("Error: Invalid directive: " + tokens[i]);
 
 		if (tokens[i] == "}" && location_level != 0)
 		{
@@ -206,16 +206,16 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 
 	setDefaults();
 
-	for (std::vector<Server>::const_iterator it = servers.cbegin(); it != servers.cend(); ++it)
+	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); ++it)
 	{
 		const std::vector<std::string> names = it->getServerNames();
 	
 		for (size_t j = 0; j < names.size(); ++j)
 		{
-			for (std::vector<Server>::const_iterator it2 = it + 1; it2 != servers.cend(); ++it2)
+			for (std::vector<Server>::iterator it2 = it + 1; it2 != servers.end(); ++it2)
 			{
-				if (names[j] != "" && std::find(it2, servers.cend(), names[j]) != servers.cend())
-					throw std::runtime_error("Duplicate server name: " + names[j]);
+				if (names[j] != "" && std::find(it2, servers.end(), names[j]) != servers.end())
+					throw std::runtime_error("Error: Duplicate server name: " + names[j]);
 			}
 		}
 	}
