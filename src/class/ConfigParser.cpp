@@ -185,7 +185,7 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 		{
 			if (location_level == 1 && tokens[i] != "root")
 				throw std::runtime_error("Error: " + tokens[i] + " is not allowed here");
-			else if (location_level == 1)
+			if (location_level == 1)
 				root(tokens, server_index, i);
 			else
  				setProperties(servers[server_index].locations[current_location.back()], tokens, i);
