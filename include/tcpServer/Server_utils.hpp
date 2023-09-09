@@ -19,15 +19,15 @@ class ResponseHeaders
 
 struct ClientInfo
 {
+	std::string							url;
+	std::string							method;
+	std::string 						response;
+	std::string							full_path;
 	std::string							allRequest;
 	std::string 						requestBody;
-	std::map<std::string,std::string> 	requestHeaders;
-	std::string							method;
-	std::string							url;
-	std::string							uri;
-	std::string							full_path;
-	std::string 						response;
+	std::string							httpVersion;
 	std::string							reqstFirstline;
+	std::map<std::string,std::string> 	requestHeaders;
 };
 
 struct	ServerInfo

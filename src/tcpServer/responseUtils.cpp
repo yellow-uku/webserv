@@ -24,6 +24,16 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& listen)
 		return ;
 	}
 
+	if (clients[client_socket].url == "" || clients[client_socket].httpVersion != "HTTP/1.1"
+		|| clients[client_socket].requestHeaders["Host"] == "")
+	{
+		heading.http_status = "400";
+		fileName = servData.root + "/" + servData.error_pages[400];
+		buildResponse(fileName, heading, 0, client_socket);
+
+		return ;
+	}
+
 	if (clients[client_socket].method == "GET")
 	{
 		if (isDir(fileName))

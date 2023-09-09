@@ -12,12 +12,12 @@ void TCPserver::parseRequest(int client_socket)
 
 	clients[client_socket].reqstFirstline = readLine(request, start);
 
-	while(true)
-	{
-		line = readLine(request, start);
-		if(!findKeyValue(line, client_socket))
-			break ;
-	}
+	// while(true) // infinite loop
+	// {
+	// 	line = readLine(request, start);
+	// 	if(!findKeyValue(line, client_socket))
+	// 		break ;
+	// }
 
 	if (start < request.size() - 1)
 		clients[client_socket].requestBody = clients[client_socket].allRequest.substr(start);
@@ -55,9 +55,9 @@ bool TCPserver::findKeyValue(std::string &line, size_t index)
 
 	std::string kval, vval;
 
-	kval = line.substr(0,len);
+	kval = line.substr(0, len);
 
-	while (std::isspace(line[++len]));
+	while (line[len] && std::isspace(line[++len]));
 
 	vval = line.substr(len, line.find("\n"));
 
@@ -68,39 +68,21 @@ bool TCPserver::findKeyValue(std::string &line, size_t index)
 
 void TCPserver::setUrlAndMethod(int client_socket)
 {
-	std::string 		url;
-	std::string 		uri;
-	std::string 		method;
 	std::stringstream	ss;
 
 	ss << clients[client_socket].reqstFirstline << "\n";
 
-	std::getline(ss, method, ' ');
+	ss >> clients[client_socket].method;
+	ss >> clients[client_socket].url;
+	ss >> clients[client_socket].httpVersion;
 
-	if(clients[client_socket].reqstFirstline.find('?') != std::string::npos)
-	{
-		std::getline(ss, url, '?');
-		std::getline(ss, uri, ' ');
-	}
-	else
-	{
-		std::getline(ss, url, ' ');
-		uri = " ";
-	}
+	// erase last / of the url
+	if (clients[client_socket].url[clients[client_socket].url.size() - 1] == '/')
+		clients[client_socket].url.erase(clients[client_socket].url.size() - 1, 1);
 
-	// if(url[0] == '/')
-	// 	url.erase(0, 1); why need this ?
-
-	if (url[url.size() - 1] == '/')
-		url.erase(url.size() - 1, 1);
-
-	clients[client_socket].method = method;
-	clients[client_socket].url = url;
-	clients[client_socket].uri = uri;
-
-	std::cout << "method->" << method << std::endl;
-	std::cout << "url->" << url << std::endl;
-	std::cout << "uri->" << uri << std::endl;
+	std::cout << "method->" << clients[client_socket].method << std::endl;
+	std::cout << "url->" << clients[client_socket].url << std::endl;
+	std::cout << "HTTP version->" << clients[client_socket].httpVersion << std::endl << std::endl;
 }
 
 size_t TCPserver::urlLength(std::string &str)

@@ -23,6 +23,7 @@ char const * const ConfigParser::allowed_methods[] = {
 };
 
 char const * const ConfigParser::error_pages[] = {
+	"error_pages/400.html",
 	"error_pages/403.html",
 	"error_pages/404.html",
 	"error_pages/405.html",
@@ -31,6 +32,7 @@ char const * const ConfigParser::error_pages[] = {
 };
 
 const int ConfigParser::error_page_numbers[] = {
+	400,
 	403,
 	404,
 	405,
