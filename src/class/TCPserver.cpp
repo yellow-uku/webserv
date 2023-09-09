@@ -1,4 +1,4 @@
-# include "TCPserver.hpp"
+#include "TCPserver.hpp"
 
 TCPserver::TCPserver(const Config& conf)
 {
@@ -18,6 +18,7 @@ TCPserver::TCPserver(const Config& conf)
 		servinfo.info.max_body_size = serv.getMaxBodySize();
 		servinfo.info.root = serv.getRoot();
 		servinfo.info.cgi = "/bin/ls"; // ??
+		servinfo.info.redirect = "";
 		servinfo.info.uploadDir = servinfo.info.root + "/upload_dir";
 		servinfo.info.autoindex = false;
 		servinfo.info.index_files.push_back("index.html");
@@ -34,6 +35,7 @@ TCPserver::TCPserver(const Config& conf)
 			servinfo.info.location[it->first].allow_methods = (it->second).getArrayOf("allow_methods");
 			servinfo.info.location[it->first].index_files = (it->second).getArrayOf("index");
 
+			servinfo.info.location[it->first].redirect = (it->second).getValueOf("return");
 			servinfo.info.location[it->first].root = (it->second).getValueOf("root");
 			servinfo.info.location[it->first].autoindex = ((it->second).getValueOf("autoindex") == "on");
 			servinfo.info.location[it->first].cgi = (it->second).getValueOf("cgi");
@@ -106,6 +108,7 @@ void TCPserver::server_loop()
 			if (FD_ISSET(i, &read))
 			{
 				std::vector<socket_t>::iterator it = std::find(sockets.begin(), sockets.end(), i);
+
 				if (it != sockets.end())
 				{
 					int clnt = accept(i, (struct sockaddr *)&clntAddr, &clntAddrlen);
@@ -114,7 +117,7 @@ void TCPserver::server_loop()
 					{
 						std::cerr << "accept failed -> " << errno << std::endl;
 						perror("accept");
-						// exit (0); /// TODO: something 
+						break ; // is this enough
 					}
 
 					if (clnt > max_fd)
@@ -129,14 +132,17 @@ void TCPserver::server_loop()
 				else
 				{
 					ret = recvfully(i);
-					if (ret <= 0)
+					if (ret <= 0 || ret == MAX_BUF)
 					{
 						close (i);
 						clients.erase(i);
 						allFd.erase(std::find(allFd.begin(), allFd.end(), i));
 						FD_CLR(i, &main_write);
 						FD_CLR(i, &main_read);
-						std::cout << "ret <= 0\n";
+
+						if (ret == MAX_BUF)
+							std::cout << "Request too large\n";
+
 						break ;
 					}
 

@@ -27,16 +27,12 @@ bool TCPserver::checkBodySize(std::string &fileName, ResponseHeaders &heading, S
 
 bool TCPserver::isRedirect(ResponseHeaders &headData, ServerInfo &servData, int client_socket)//poxel prototype
 {
-	if (servData.redirect[0] == '/')
-		servData.redirect.erase(0, 1);
-
 	if(!servData.redirect.size() || clients[client_socket].url == servData.redirect)
 		return false;
 
 	(void) headData;
 
 	clients[client_socket].response = "HTTP/1.1 307 Temporary Redirect\r\n"
-	"HTTP/1.1 307 Temporary Redirect\r\n"
 	"Location: " + servData.redirect + "\r\n"
 	"Content-Length: 0\r\n"
 	"Connection: close\r\n"

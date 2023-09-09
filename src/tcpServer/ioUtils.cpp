@@ -8,10 +8,7 @@ int TCPserver::recvfully(int clnt)
 
 	bytes = recv(clnt, buf, MAX_BUF, 0);
 
-	if (bytes == MAX_BUF + 1)
-		;/// TODO: ban ara
-
-	if(bytes <= 0)
+	if(bytes <= 0 || bytes == MAX_BUF)
 		return bytes;
 
 	buf[bytes] = 0;
@@ -27,8 +24,7 @@ void	TCPserver::sendResponse(int clnt)
 	// std::cout << "resp - >" << clients[clnt].response.c_str() << std::endl;
 	if (send(clnt, clients[clnt].response.c_str(), clients[clnt].response.size(), 0) < 0)
 	{
-		std::cerr << "Send() failed" << std::endl;
-		exit (0); // NEED TO CHANGE!!!! 
+		perror("Send");
 	}
 }
 

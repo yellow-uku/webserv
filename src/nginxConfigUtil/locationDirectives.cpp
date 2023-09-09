@@ -62,11 +62,15 @@ void ConfigParser::setVectors(Location& current_location, const std::vector<std:
 	i = count;
 }
 
-void ConfigParser::storeLocation(const std::vector<std::string>& tokens, std::vector<std::string>& current_location, size_t& location_level, const size_t& server_index, size_t& i)
+void ConfigParser::storeLocation(std::vector<std::string>& tokens, std::vector<std::string>& current_location, size_t& location_level, const size_t& server_index, size_t& i)
 {
+	++i;
+
+	if (tokens[i][tokens[i].size() - 1] == '/')
+		tokens[i].erase(tokens[i].size() - 1, 1);
+
 	if (location_level == 1)
 	{
-		++i;
 		current_location.push_back(tokens[i]);
 		
 		Location temp;
@@ -83,7 +87,6 @@ void ConfigParser::storeLocation(const std::vector<std::string>& tokens, std::ve
 	}
 	else
 	{
-		++i;
 		if (IS_OUTSIDE_LOCATION(tokens[i], current_location.back()))
 			throw std::runtime_error(tokens[i] + " is outside location " + current_location.back());
 

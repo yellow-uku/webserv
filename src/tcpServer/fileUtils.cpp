@@ -79,16 +79,20 @@ std::string TCPserver::listDir(std::string &name)
 							"</head>\r\n"
 							"<body>\r\n"
 							"<ul>\r\n";
+
 	folder = opendir(name.c_str());
+
 	if(folder == NULL)
 	{
-		std::cerr << "Error occured" << std::endl;
-		return std::string("not found");
+		perror("Opendir");
+		return "not found";
 	}
+
 	while( (entry = readdir(folder)) )
 	{
 		htmlCode = htmlCode + "<li>" + entry->d_name + "</li>\r\n";
 	}
+
 	closedir(folder);
 	htmlCode = htmlCode +  "</ul>\r\n" + "</body>\r\n" + "</html>\r\n";
 	return htmlCode;

@@ -68,10 +68,10 @@ bool TCPserver::findKeyValue(std::string &line, size_t index)
 
 void TCPserver::setUrlAndMethod(int client_socket)
 {
-	std::stringstream	ss;
 	std::string 		url;
 	std::string 		uri;
 	std::string 		method;
+	std::stringstream	ss;
 
 	ss << clients[client_socket].reqstFirstline << "\n";
 
@@ -90,6 +90,9 @@ void TCPserver::setUrlAndMethod(int client_socket)
 
 	// if(url[0] == '/')
 	// 	url.erase(0, 1); why need this ?
+
+	if (url[url.size() - 1] == '/')
+		url.erase(url.size() - 1, 1);
 
 	clients[client_socket].method = method;
 	clients[client_socket].url = url;
