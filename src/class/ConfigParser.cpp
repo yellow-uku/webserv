@@ -86,9 +86,19 @@ void ConfigParser::init_locations(Location& location, const size_t& server_index
 	}
 	else
 	{
+		const std::string& upload_dir = location.getValueOf("upload_dir");
+
 		if (location.getValueOf("root") == "")
 		{
 			location.setRoot(servers[server_index].getRoot());
+		}
+		if (upload_dir == "")
+		{
+			location.setUploadDir(servers[server_index].getRoot() + UPLOAD_DIRECTORY);
+		}
+		else if (upload_dir[0] != '/')
+		{
+			location.setUploadDir(location.getValueOf("root") + upload_dir);
 		}
 		if (location.getArrayOf("index").size() == 0)
 		{
@@ -173,7 +183,9 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 			errorPage(tokens, server_index, location_level, i);
 		else if (contains(single_value_directives_location, tokens[i]))
 		{
-			if (location_level == 1)
+			if (location_level == 1 && tokens[i] != "root")
+				throw std::runtime_error("Error: " + tokens[i] + " is not allowed here");
+			else if (location_level == 1)
 				root(tokens, server_index, i);
 			else
  				setProperties(servers[server_index].locations[current_location.back()], tokens, i);

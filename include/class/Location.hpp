@@ -12,7 +12,7 @@
 # define DEFAULT_AUTOINDEX "off"
 # define DEFAULT_INDEX "index.html"
 # define DEFAULT_CGI "/usr/bin/python"
-# define UPLOAD_DIRECTORY "www/upload/"
+# define UPLOAD_DIRECTORY "/upload/"
 
 class Location
 {

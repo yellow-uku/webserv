@@ -2,7 +2,7 @@
 
 Location::Location():
 	_location_level(1), _cgi(DEFAULT_CGI), _root(), _autoindex(DEFAULT_AUTOINDEX), _httpRedir(HTTP_REDIRECTION),
-	_upload_dir(UPLOAD_DIRECTORY), _indexes(), _allowed_methods(), _parent()
+	_upload_dir(), _indexes(), _allowed_methods(), _parent()
 {
 
 }
@@ -39,7 +39,7 @@ void Location::setAutoindex(const std::string& autoindex) { _autoindex = autoind
 
 void Location::setHttpRedir(const std::string& redir) { _httpRedir = redir; }
 
-void Location::setUploadDir(const std::string& dir) { _upload_dir = dir; }
+void Location::setUploadDir(const std::string& dir) { _upload_dir = dir[dir.size() - 1] == '/' ? dir : dir + '/'; }
 
 void Location::setLevel(const int& level) { _location_level = level; }
 

@@ -24,7 +24,6 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& listen)
 		return ;
 	}
 
-
 	if (clients[client_socket].method == "GET")
 	{
 		if (isDir(fileName))
@@ -49,7 +48,7 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& listen)
 	}
 	else if (clients[client_socket].method == "POST")
 	{
-		std::fstream file((servData.root + clients[client_socket].url).c_str(), std::fstream::out);
+		std::fstream file((servData.uploadDir + clients[client_socket].url).c_str(), std::fstream::out);
 
 		if (file.fail())
 			perror("Fstream");
@@ -58,7 +57,7 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& listen)
 	}
 	else if (clients[client_socket].method == "DELETE")
 	{
-		std::remove((servData.root + clients[client_socket].url).c_str());
+		std::remove((servData.uploadDir + clients[client_socket].url).c_str());
 	}
 }
 
