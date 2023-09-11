@@ -12,12 +12,12 @@ void TCPserver::parseRequest(int client_socket)
 
 	clients[client_socket].reqstFirstline = readLine(request, start);
 
-	// while(true) // infinite loop
-	// {
-	// 	line = readLine(request, start);
-	// 	if(!findKeyValue(line, client_socket))
-	// 		break ;
-	// }
+	while(true) // infinite loop
+	{
+		line = readLine(request, start);
+		if(!findKeyValue(line, client_socket))
+			break ;
+	}
 
 	if (start < request.size() - 1)
 		clients[client_socket].requestBody = clients[client_socket].allRequest.substr(start);
@@ -69,6 +69,7 @@ bool TCPserver::findKeyValue(std::string &line, size_t index)
 void TCPserver::setUrlAndMethod(int client_socket)
 {
 	std::stringstream	ss;
+	std::string& url = clients[client_socket].url;
 
 	ss << clients[client_socket].reqstFirstline << "\n";
 
@@ -77,8 +78,8 @@ void TCPserver::setUrlAndMethod(int client_socket)
 	ss >> clients[client_socket].httpVersion;
 
 	// erase last / of the url
-	if (clients[client_socket].url[clients[client_socket].url.size() - 1] == '/')
-		clients[client_socket].url.erase(clients[client_socket].url.size() - 1, 1);
+	if (url != "/" && url[url.size() - 1] == '/')
+		url.erase(url.size() - 1, 1);
 
 	std::cout << "method->" << clients[client_socket].method << std::endl;
 	std::cout << "url->" << clients[client_socket].url << std::endl;

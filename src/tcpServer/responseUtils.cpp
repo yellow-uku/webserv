@@ -53,22 +53,32 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& listen)
 				return ;
 			}
 		}
-		checkFile(fileName, heading, servData);// body,methods 
-		buildResponse(fileName, heading, 0, client_socket);
 	}
 	else if (clients[client_socket].method == "POST")
 	{
 		std::fstream file((servData.uploadDir + clients[client_socket].url).c_str(), std::fstream::out);
 
+		std::cout << (servData.uploadDir + clients[client_socket].url).c_str() << "\n";
+
 		if (file.fail())
+		{
+			heading.http_status = "404";
+			fileName = servData.root + "/" + servData.error_pages[404];
 			perror("Fstream");
+		}
 		else
 			file << clients[client_socket].requestBody.c_str();
 	}
 	else if (clients[client_socket].method == "DELETE")
 	{
-		std::remove((servData.uploadDir + clients[client_socket].url).c_str());
+		if (std::remove((servData.uploadDir + clients[client_socket].url).c_str()) != 0)
+		{
+			heading.http_status = "404";
+			fileName = servData.uploadDir + servData.error_pages[404];
+			perror("Remove");
+		}
 	}
+	buildResponse(fileName, heading, 0, client_socket);
 }
 
 void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, bool dir, int client_socket)

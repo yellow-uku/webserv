@@ -78,7 +78,8 @@
 		"condition_variable": "cpp",
 		"queue": "cpp",
 		"thread": "cpp",
-		"cinttypes": "cpp"
+		"cinttypes": "cpp",
+		"filesystem": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "disabled",
 	"editor.insertSpaces": false,

@@ -19,7 +19,7 @@ TCPserver::TCPserver(const Config& conf)
 		servinfo.info.root = serv.getRoot();
 		servinfo.info.cgi = "/bin/ls"; // ??
 		servinfo.info.redirect = "";
-		servinfo.info.uploadDir = servinfo.info.root + "/upload_dir";
+		servinfo.info.uploadDir = serv.getRoot() + "/upload";
 		servinfo.info.autoindex = false;
 		servinfo.info.index_files.push_back("index.html");
 
