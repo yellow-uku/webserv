@@ -3,8 +3,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-
-
 int main()
 {
 	
@@ -14,51 +12,67 @@ int main()
 	// Create a pipe to capture the output of the CGI script
 	int pipefd[2];
 
-	if (pipe(pipefd) == -1) {
-		perror("pipe");
+	int pipe_to_child[2];
+	int pipe_from_child[2];
+
+	if (pipe(pipe_to_child) == -1 or pipe(pipe_from_child) == -1)  {
+		perror("pipe error");
 		return 1;
 	}
 
 	// Fork a child process
-	pid_t pid = fork();
+	pid_t child = fork();
 
-	if (pid == -1) {
-		perror("fork");
+	if (child == -1) {
+		perror("fork error");
 		return 1;
 	}
 
-	if (pid == 0) { // Child process
+	if (child == 0) { // Child process
 
-		close(pipefd[readEnd]);
+		// Close unnecessary ends of the pipe
+		close(pipe_to_child[writeEnd]);
+		close(pipe_from_child[readEnd]);
 
-		// Redirect stdout to the write end of the pipe
-		dup2(pipefd[writeEnd], STDOUT_FILENO);
+		// Redirect stdin and stdout to the pipes
+		dup2(pipe_to_child[readEnd], STDIN_FILENO);
+		dup2(pipe_from_child[writeEnd], STDOUT_FILENO);
 
 		// Replace the child process with the process of CGI script
 		const char* scriptPath = "hello.py";
 		char* const cgiArgs[] = { const_cast<char*>(scriptPath), nullptr };
-		execve(scriptPath, cgiArgs, nullptr);
+		
+		if (execve(scriptPath, cgiArgs, nullptr) == -1)
+			perror("execve error");
 
-		// If execve fails, print an error message
-		perror("execve");
 		exit(1);
 	} 
-	else { // Parent process
+	else if (child > 0)
+	{ // Parent process
 	
-		close(pipefd[writeEnd]);
+		close(pipe_to_child[readEnd]);
+		close(pipe_from_child[writeEnd]);
+
+		// Send data to the child process
+		const char*	requestData = "example_data\n";
+		write(pipe_to_child[writeEnd], requestData, strlen(requestData));
+		close(pipe_to_child[writeEnd]); // Close the write end to signal the end of data
 
 		// Read and display the CGI script's output
 		char buffer[1024];
 		ssize_t bytesRead;
-		while ((bytesRead = read(pipefd[readEnd], buffer, sizeof(buffer))) > 0) {
-			write(STDOUT_FILENO, buffer, bytesRead);
+		while ((bytesRead = read(pipe_from_child[readEnd], buffer, sizeof(buffer))) > 0) {
+			if (write(STDOUT_FILENO, buffer, bytesRead) == -1)
+				perror("write to CGI error");
 		}
 
-		close(pipefd[readEnd]);
+		close(pipe_from_child[readEnd]);
 
 		// Wait for the child process to finish
-		wait(nullptr);
+		waitpid(child, NULL, 0);
 	}
+	else
+		perror("fork doesn't work");
 
 	return 0;
 }
