@@ -14,10 +14,12 @@ TCPserver::info_iterator TCPserver::findLocation(const std::vector<server_t>::it
 		pos = route.rfind('/');
 
 		if (pos == std::string::npos)
-			return it->info.location.end();
-		
+			break ;
+
 		route.erase(pos);
 	}
+
+	return it->info.location.find("/");
 }
 
 ServerInfo& TCPserver::getLocationData(const socket_t& socket, const std::string& host, const std::string& route)
