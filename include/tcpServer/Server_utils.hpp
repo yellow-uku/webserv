@@ -52,6 +52,7 @@ struct server_t {
 	std::vector<std::string>	server_names;
 
 	bool operator==(const socket_t& socket) const { return std::find(listens.begin(), listens.end(), socket) != listens.end(); }
+	bool operator==(const std::string& name) const { return std::find(server_names.begin(), server_names.end(), name) != server_names.end(); }
 };
 
 #endif// SERVER_UTILS_HPP

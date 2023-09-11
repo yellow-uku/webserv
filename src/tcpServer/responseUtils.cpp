@@ -1,15 +1,12 @@
 #include "TCPserver.hpp"
 
-void TCPserver::setResponseFile(int client_socket, const socket_t& listen)
+void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 {
-	ServerInfo			servData;
 	std::string			fileName;
 	std::string			response;
 	ResponseHeaders		heading;
 
-	ServerInfo& info = (std::find(serverData.begin(), serverData.end(), listen))->info;
-
-	servData = (isLocation(info, clients[client_socket].url) ? correctInfos(info, clients[client_socket].url) : info);
+	ServerInfo& servData = getLocationData(socket, clients[client_socket].requestHeaders["Host"], clients[client_socket].url);
 
 	heading.http_status = "200";
 

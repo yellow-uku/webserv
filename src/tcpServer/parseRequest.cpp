@@ -33,7 +33,8 @@ std::string TCPserver::readLine(std::string &all, size_t &start)
 	len = all.find("\n", start);
 
 	if (len == std::string::npos)
-		return "";//all
+		return "";
+
 	std::string retVal;
 
 	len = len - start + 1;
@@ -58,6 +59,9 @@ bool TCPserver::findKeyValue(std::string &line, size_t index)
 	while (line[len] && std::isspace(line[++len]));
 
 	vval = line.substr(len, line.find("\n"));
+
+	if (vval[vval.size() - 1] == '\n')
+		vval.erase(vval.size() - 1);
 
 	clients[index].requestHeaders[kval] = vval;
 

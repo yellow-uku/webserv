@@ -32,6 +32,9 @@
 class TCPserver
 {
 public:
+	typedef std::map<std::string, ServerInfo>::iterator info_iterator;
+
+public:
 	TCPserver(const Config& conf);
 
 	int				recvfully(int clnt);
@@ -59,7 +62,7 @@ private:
 	bool			checkDir(std::string &dirName, ResponseHeaders & heading, ServerInfo &servData);
 	bool			checkMethod(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
 	bool			checkBodySize(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
-	size_t	urlLength(std::string &str); //<-
+	size_t			urlLength(std::string &str); //<-
 	std::string		readLine(std::string &str, size_t &start);
 	std::string		readFile(std::string filename);
 	std::string		findFile(std::string filename);
@@ -69,7 +72,9 @@ private:
 	std::string		find_and_set_cont_type(int client_socket);
 	std::string		correctIndexFile(std::string &filename, ServerInfo &servData);
 	std::string		listDir(std::string &dirname);	
-	ServerInfo		correctInfos(ServerInfo &info, std::string &name);
+	ServerInfo&		getLocationData(const socket_t& socket, const std::string& host, const std::string& route);
+	info_iterator	findLocation(const std::vector<server_t>::iterator& info, std::string route);
+	// ServerInfo		correctInfos(ServerInfo &info, std::string &name);
 
 private: // dve
 	void			 getSockets(const Config& conf);

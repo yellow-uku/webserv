@@ -20,6 +20,7 @@ struct socket_t
 	bool operator==(const std::string& lhs) const ;
 
 	socket_t(): fd(-1) { }
+	socket_t(const std::string& hst, const std::string& prt): fd(-1), host(hst), port(prt) { }
 	socket_t(const int& socket, const std::string& hst, const std::string& prt): fd(socket), host(hst), port(prt) { }
 };
 

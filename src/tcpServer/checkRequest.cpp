@@ -46,8 +46,3 @@ bool TCPserver::isLocation(ServerInfo &info, std::string &name)
 {
 	return info.location.count(name);
 }
-
-ServerInfo TCPserver::correctInfos(ServerInfo &info, std::string &name)
-{
-	return info.location[name];
-}
