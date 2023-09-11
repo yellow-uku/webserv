@@ -78,6 +78,8 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& listen)
 			perror("Remove");
 		}
 	}
+	checkFile(fileName,heading,servData);
+	std::cout << fileName << " <----------" << std::endl;
 	buildResponse(fileName, heading, 0, client_socket);
 }
 

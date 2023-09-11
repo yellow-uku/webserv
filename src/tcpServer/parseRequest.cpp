@@ -11,7 +11,6 @@ void TCPserver::parseRequest(int client_socket)
 	std::string request = clients[client_socket].allRequest;
 
 	clients[client_socket].reqstFirstline = readLine(request, start);
-
 	while(true) // infinite loop
 	{
 		line = readLine(request, start);
@@ -34,8 +33,7 @@ std::string TCPserver::readLine(std::string &all, size_t &start)
 	len = all.find("\n", start);
 
 	if (len == std::string::npos)
-		return all;
-
+		return "";//all
 	std::string retVal;
 
 	len = len - start + 1;
