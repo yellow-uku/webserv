@@ -10,14 +10,14 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 
 	heading.http_status = "200";
 
-	if (isRedirect(heading,servData,client_socket))
+	if (isRedirect(heading, servData, client_socket))
 		return ;
 
 	fileName = servData.root + clients[client_socket].url;
 
 	if (!checkMethod(fileName, heading, servData, client_socket) || checkBodySize(fileName, heading, servData, client_socket))
 	{
-		buildResponse(fileName, heading, 0, client_socket);
+		buildResponse(fileName, heading, servData, 0, client_socket);
 		return ;
 	}
 
@@ -26,7 +26,7 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 	{
 		heading.http_status = "400";
 		fileName = servData.root + "/" + servData.error_pages[400];
-		buildResponse(fileName, heading, 0, client_socket);
+		buildResponse(fileName, heading, servData, 0, client_socket);
 
 		return ;
 	}
@@ -43,7 +43,7 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 			std::cout << servData.autoindex << " ------------------ " << servData.index_files[0] << "\n";
 			if (checkDir(fileName, heading, servData))
 			{
-				buildResponse(fileName, heading, 0, client_socket);
+				buildResponse(fileName, heading, servData, 0, client_socket);
 				return ;
 			}
 			if (!servData.autoindex)
@@ -52,7 +52,7 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 			}
 			else
 			{
-				buildResponse(fileName, heading, 1, client_socket);
+				buildResponse(fileName, heading, servData, 1, client_socket);
 				return ;
 			}
 		}
@@ -81,12 +81,13 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 			perror("Remove");
 		}
 	}
+
 	checkFile(fileName, heading, servData);
 	std::cout << fileName << " <----------" << std::endl;
-	buildResponse(fileName, heading, 0, client_socket);
+	buildResponse(fileName, heading, servData, 0, client_socket);
 }
 
-void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, bool dir, int client_socket)
+void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, const ServerInfo servData, bool dir, int client_socket)
 {
 	std::string response;
 	std::string headers;
@@ -97,7 +98,13 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, b
 		heading.build_headers();
 		headers = heading.headers;
 		response = headers;
-		response += readFile(fileName);
+		if (fileName.substr(fileName.rfind('.')) == ".py")
+		{
+			std::cout << clients[client_socket].full_path << "\n";
+			response += callCgi(servData, client_socket);
+		}
+		else
+			response += readFile(fileName);
 		clients[client_socket].full_path = fileName;
 		clients[client_socket].response = response;
 	}

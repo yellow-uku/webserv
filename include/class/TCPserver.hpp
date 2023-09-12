@@ -18,6 +18,7 @@
 # include <string.h>
 # include <unistd.h>
 # include <dirent.h>
+# include <sys/wait.h>
 # include <sys/stat.h>
 # include <sys/types.h>
 # include <arpa/inet.h>
@@ -52,7 +53,7 @@ private:
 	void			setUrlAndMethod(int client_socket);
 	void			createSocketAndAddToSet();
 	void			setResponseFile(int client_socket, const socket_t& listen);
-	void			buildResponse(std::string &fileName, ResponseHeaders &heading, bool dir, int client_socket);
+	void			buildResponse(std::string &fileName, ResponseHeaders &heading, const ServerInfo servData, bool dir, int client_socket);
 	bool			thereIsNoIndexFile(ServerInfo &servData);
 	bool			isDir(std::string &dirname);
 	bool			isLocation(ServerInfo &info, std::string &name);
@@ -75,6 +76,10 @@ private:
 	ServerInfo&		getLocationData(const socket_t& socket, const std::string& host, const std::string& route);
 	info_iterator	findLocation(const std::vector<server_t>::iterator& info, std::string route);
 	// ServerInfo		correctInfos(ServerInfo &info, std::string &name);
+
+	std::string callCgi(const ServerInfo& servData, int client_socket);
+
+
 
 private: // dve
 	void			 getSockets(const Config& conf);
