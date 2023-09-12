@@ -54,9 +54,10 @@ bool TCPserver::checkDir(std::string &dirName, ResponseHeaders &heading, ServerI
 bool TCPserver::isDir(std::string &name)
 {
 	DIR *folder;
+
 	folder = opendir(name.c_str());
 
-	if(folder == NULL)
+	if (folder == NULL)
 		return false;
 
 	if (name[name.size() - 1] != '/')

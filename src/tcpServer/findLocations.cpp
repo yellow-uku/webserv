@@ -24,7 +24,7 @@ TCPserver::info_iterator TCPserver::findLocation(const std::vector<server_t>::it
 
 ServerInfo& TCPserver::getLocationData(const socket_t& socket, const std::string& host, const std::string& route)
 {
-	ServerInfo& info = serverData[0].info; // default location (std::find(serverData.begin(), serverData.end(), socket))->info;
+	ServerInfo& info = serverData[0].info; // default location
 
 	size_t count = std::count(serverData.begin(), serverData.end(), socket);
 
@@ -36,7 +36,7 @@ ServerInfo& TCPserver::getLocationData(const socket_t& socket, const std::string
 	{
 		TCPserver::info_iterator l_it = findLocation(it, route);
 
-		return l_it == it->info.location.end() ? info : l_it->second;
+		return l_it == it->info.location.end() ? it->info : l_it->second;
 	}
 
 	if (count > 1)
@@ -48,7 +48,7 @@ ServerInfo& TCPserver::getLocationData(const socket_t& socket, const std::string
 
 		TCPserver::info_iterator l_it = findLocation(it, route);
 
-		return l_it == it->info.location.end() ? info : l_it->second;
+		return l_it == it->info.location.end() ? it->info : l_it->second;
 	}
 
 	if (count == 0)
@@ -57,7 +57,7 @@ ServerInfo& TCPserver::getLocationData(const socket_t& socket, const std::string
 
 		TCPserver::info_iterator l_it = findLocation(it, route);
 
-		return l_it == it->info.location.end() ? info : l_it->second;
+		return l_it == it->info.location.end() ? it->info : l_it->second;
 	}
 
 	return info;
