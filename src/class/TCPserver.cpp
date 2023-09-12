@@ -19,7 +19,7 @@ TCPserver::TCPserver(const Config& conf)
 		servinfo.info.root = serv.getRoot();
 		servinfo.info.cgi = "/bin/ls"; // ??
 		servinfo.info.redirect = "";
-		servinfo.info.uploadDir = serv.getRoot() + "/upload";
+		servinfo.info.uploadDir = serv.getRoot() + "/upload/";
 		servinfo.info.autoindex = false;
 		servinfo.info.index_files.push_back("index.html");
 
@@ -146,7 +146,7 @@ void TCPserver::server_loop()
 
 					std::cout << clients[i].allRequest << "\n";
 
-					
+
 
 					setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
 					FD_SET(i, &main_write);
