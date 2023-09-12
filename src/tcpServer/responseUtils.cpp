@@ -33,11 +33,8 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 
 	if (clients[client_socket].method == "GET")
 	{
-		std::cout << isDir(fileName) << "asdasasd\n";
-
 		if (isDir(fileName))
 		{
-			std::cout << servData.autoindex << " ------------------ " << servData.index_files[0] << "\n";
 			if (checkDir(fileName, heading, servData))
 			{
 				buildResponse(fileName, heading, servData, 0, client_socket);
@@ -81,7 +78,6 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 	}
 
 	checkFile(fileName, heading, servData);
-	std::cout << fileName << " <----------" << std::endl;
 	buildResponse(fileName, heading, servData, 0, client_socket);
 }
 

@@ -98,8 +98,6 @@ void TCPserver::server_loop()
 
 		rc = select(max_fd + 1, &read, &write, NULL, NULL);
 
-		std::cout << "select returned, " << rc << "\n";
-
 		if (rc == 0)
 			continue ;
 

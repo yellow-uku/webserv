@@ -66,6 +66,16 @@ void ConfigParser::storeLocation(std::vector<std::string>& tokens, std::vector<s
 {
 	++i;
 
+	// if you're bored enough
+
+	// size_t pos = 0;
+	// size_t end = tokens[i][tokens[i].size() - 1];
+
+	// while (tokens[i][end] == '/') --end;
+
+	// while ((pos = tokens[i].rfind(start, '/')) != std::string::npos)
+	// 	tokens[i].erase(pos);
+
 	if (tokens[i][tokens[i].size() - 1] == '/')
 		tokens[i].erase(tokens[i].size() - 1, 1);
 

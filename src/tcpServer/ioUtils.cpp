@@ -21,7 +21,6 @@ int TCPserver::recvfully(int clnt)
 
 void	TCPserver::sendResponse(int clnt)
 {
-	// std::cout << "resp - >" << clients[clnt].response.c_str() << std::endl;
 	if (send(clnt, clients[clnt].response.c_str(), clients[clnt].response.size(), 0) < 0)
 	{
 		perror("Send");
