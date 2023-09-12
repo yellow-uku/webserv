@@ -1,3 +1,5 @@
 #!/usr/local/bin/python3
 
-print("hello, world!")
+a = input()
+
+print(" kjha skjha skjha sdk jhas kd jahs dkjh ")

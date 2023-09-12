@@ -33,9 +33,6 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 
 	if (clients[client_socket].method == "GET")
 	{
-		std::cout << fileName << "\n";
-		std::cout << servData.autoindex << " ------------------ " << servData.index_files[0] << "\n";
-
 		std::cout << isDir(fileName) << "asdasasd\n";
 
 		if (isDir(fileName))
@@ -59,18 +56,19 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 	}
 	else if (clients[client_socket].method == "POST")
 	{
-		std::fstream file((servData.uploadDir + clients[client_socket].url).c_str(), std::fstream::out);
+		callCgi(servData, client_socket);
+		// std::fstream file((servData.uploadDir + clients[client_socket].url).c_str(), std::fstream::out);
 
-		std::cout << (servData.uploadDir + clients[client_socket].url).c_str() << "\n";
+		// std::cout << (servData.uploadDir + clients[client_socket].url).c_str() << "\n";
 
-		if (file.fail())
-		{
-			heading.http_status = "404";
-			fileName = servData.root + "/" + servData.error_pages[404];
-			perror("Fstream");
-		}
-		else
-			file << clients[client_socket].requestBody.c_str();
+		// if (file.fail())
+		// {
+		// 	heading.http_status = "404";
+		// 	fileName = servData.root + "/" + servData.error_pages[404];
+		// 	perror("Fstream");
+		// }
+		// else
+		// 	file << clients[client_socket].requestBody.c_str();
 	}
 	else if (clients[client_socket].method == "DELETE")
 	{
@@ -100,7 +98,6 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, c
 		response = headers;
 		if (fileName.substr(fileName.rfind('.')) == ".py")
 		{
-			std::cout << clients[client_socket].full_path << "\n";
 			response += callCgi(servData, client_socket);
 		}
 		else
