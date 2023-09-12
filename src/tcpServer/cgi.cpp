@@ -64,25 +64,26 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 		close(pipe_to_child[writeEnd]); // Close the write end to signal the end of data
 
 		// Read and display the CGI script's output
-		char buffer[1024];
+
+		char c;
+		std::string buffer;
 		ssize_t bytesRead;
 
-		ssize_t length = 0;
-
-		while ((bytesRead = read(pipe_from_child[readEnd], buffer, sizeof(buffer))) > 0) {
-			if (write(STDOUT_FILENO, buffer, bytesRead) == -1)
-				perror("write to CGI error");
-			length += bytesRead;
+		while ((bytesRead = read(pipe_from_child[readEnd], &c, 1)) > 0)
+		{
+			buffer.push_back(c);
 		}
 
-		buffer[length] = 0;
-
 		close(pipe_from_child[readEnd]);
+
+		std::cout << "\x1B[35m" <<  buffer << "\x1B[0m\n";
+
+		std::cout << clients[client_socket].requestBody << "------------------------\n";
 
 		// Wait for the child process to finish
 		waitpid(child, NULL, 0);
 
-		return std::string(buffer);
+		return buffer;
 	}
 	else
 		perror("fork doesn't work");

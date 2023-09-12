@@ -146,6 +146,8 @@ void TCPserver::server_loop()
 
 					std::cout << clients[i].allRequest << "\n";
 
+					
+
 					setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
 					FD_SET(i, &main_write);
 					FD_CLR(i, &main_read);

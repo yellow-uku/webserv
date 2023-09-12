@@ -4,14 +4,16 @@ int TCPserver::recvfully(int clnt)
 {
 	int bytes = 0;
 
-	char buf[MAX_BUF + 1];
+	std::vector<char> buff(1024 * 1024);
 
-	bytes = recv(clnt, buf, MAX_BUF, 0);
+	bytes = recv(clnt, &buff[0], buff.size() ,0);
 
-	if(bytes <= 0 || bytes == MAX_BUF)
+	if (bytes <= 0)
 		return bytes;
 
-	buf[bytes] = 0;
+	buff[bytes] = '\0';
+
+	std::string buf(buff.begin(), buff.end());
 
 	clients[clnt].allRequest = buf;
 	parseRequest(clnt);

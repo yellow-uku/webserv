@@ -11,10 +11,10 @@ void TCPserver::parseRequest(int client_socket)
 	std::string request = clients[client_socket].allRequest;
 
 	clients[client_socket].reqstFirstline = readLine(request, start);
-	while(true) // infinite loop
+	while (true)
 	{
 		line = readLine(request, start);
-		if(!findKeyValue(line, client_socket))
+		if (!findKeyValue(line, client_socket))
 			break ;
 	}
 
@@ -22,6 +22,9 @@ void TCPserver::parseRequest(int client_socket)
 		clients[client_socket].requestBody = clients[client_socket].allRequest.substr(start);
 	else
 		clients[client_socket].requestBody = "";
+
+	std::cout << "bodyL  L L L LL " << clients[client_socket].requestBody << "\n";
+	std::cout << start << " " << request.size() << "\n";;
 
 	setUrlAndMethod(client_socket);
 }
