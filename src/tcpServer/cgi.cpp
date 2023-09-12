@@ -77,8 +77,6 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 
 		buffer[length] = 0;
 
-		std::cout << buffer << "  buffer \n";
-
 		close(pipe_from_child[readEnd]);
 
 		// Wait for the child process to finish
