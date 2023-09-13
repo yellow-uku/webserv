@@ -23,9 +23,6 @@ void TCPserver::parseRequest(int client_socket)
 	else
 		clients[client_socket].requestBody = "";
 
-	std::cout << "bodyL  L L L LL " << clients[client_socket].requestBody << "\n";
-	std::cout << start << " " << request.size() << "\n";;
-
 	setUrlAndMethod(client_socket);
 }
 
@@ -82,12 +79,19 @@ void TCPserver::setUrlAndMethod(int client_socket)
 	ss >> clients[client_socket].url;
 	ss >> clients[client_socket].httpVersion;
 
+	if (url.find('?') != std::string::npos)
+	{
+		clients[client_socket].query = url.substr(url.find('?') + 1);
+		url.erase(url.find('?'));
+	}
+
 	// erase last / of the url
 	if (url != "/" && url[url.size() - 1] == '/')
 		url.erase(url.size() - 1, 1);
 
 	std::cout << "method->" << clients[client_socket].method << std::endl;
 	std::cout << "url->" << clients[client_socket].url << std::endl;
+	std::cout << "query->" << clients[client_socket].query << std::endl;
 	std::cout << "HTTP version->" << clients[client_socket].httpVersion << std::endl << std::endl;
 }
 

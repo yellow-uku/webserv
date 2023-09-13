@@ -20,6 +20,7 @@ class ResponseHeaders
 struct ClientInfo
 {
 	std::string							url;
+	std::string							query;
 	std::string							method;
 	std::string 						response;
 	std::string							full_path;

@@ -154,7 +154,6 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 {
 	size_t server_index = 0;
 	size_t location_level = 0;
-	size_t location_index = 0;
 
 	std::vector<std::string> current_location;
 
@@ -211,13 +210,10 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 
 			if (current_location.size())
 				current_location.pop_back();
-			if (location_level == 1)
-				++location_index;
 		}
 		if (tokens[i] == "}" && location_level == 0)
 		{
 			++server_index;
-			location_index = 0;
 		}
 	}
 
