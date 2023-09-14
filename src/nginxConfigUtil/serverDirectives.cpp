@@ -148,6 +148,7 @@ size_t ConfigParser::getActualBodySize(const std::string& token)
 			throw std::runtime_error("invalid max_body_size value");
 
 		size_t power = 1;
+
 		if (unit == 'k')
 			power = std::pow(10, 3);
 		else if (unit == 'm')
@@ -157,12 +158,16 @@ size_t ConfigParser::getActualBodySize(const std::string& token)
 		else
 			throw std::runtime_error("invalid max_body_size value");
 
-		if ((unit == 'm' && to_int > std::pow(10, 5)) || (unit == 'g' && to_int > std::pow(10, 3)))
+		if ((unit == 'm' && to_int > std::pow(10, 5))
+			|| (unit == 'g' && to_int > std::pow(10, 3))
+			|| (unit == 'k' && to_int > std::pow(10, 7)))
 			throw std::runtime_error("invalid max_body_size value");
+
 		return static_cast<size_t>(to_int) * power;
 	}
 
 	int to_int = my_stoi(token);
+
 	if (to_int < 0)
 		throw std::runtime_error("invalid max_body_size value");
 

@@ -8,7 +8,8 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 	int pipe_to_child[2];
 	int pipe_from_child[2];
 
-	if (pipe(pipe_to_child) == -1 or pipe(pipe_from_child) == -1)  {
+	if (pipe(pipe_to_child) == -1 or pipe(pipe_from_child) == -1)
+	{
 		perror("pipe error");
 		return "";
 	}
@@ -31,9 +32,9 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 
 		std::string scriptPath = (servData.root + clients[client_socket].url);
 
-		char * cgiArgs[] = { const_cast<char *>(scriptPath.c_str()), nullptr };
+		char * cgiArgs[] = { const_cast<char *>(scriptPath.c_str()), NULL };
 
-		execve(scriptPath.c_str(), cgiArgs, nullptr);
+		execve(scriptPath.c_str(), cgiArgs, NULL);
 
 		perror("execve error");
 
@@ -43,7 +44,6 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 	} 
 	else
 	{
-	
 		close(pipe_to_child[readEnd]);
 		close(pipe_from_child[writeEnd]);
 
@@ -63,9 +63,9 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 
 		close(pipe_from_child[readEnd]);
 
-		std::cout << "\x1B[35m" <<  buffer << "\x1B[0m\n";
+		std::cout << "\x1B[35mBuffer: " <<  buffer << "\x1B[0m\n";
 
-		std::cout << clients[client_socket].requestBody << "------------------------\n";
+		std::cout << "Request body:" << clients[client_socket].requestBody << "\n";
 
 		waitpid(child, NULL, 0);
 
