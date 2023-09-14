@@ -50,7 +50,7 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 		const char*	requestData = clients[client_socket].requestBody.c_str();
 
 		write(pipe_to_child[writeEnd], requestData, strlen(requestData));
-		close(pipe_to_child[writeEnd]); // Close the write end to signal the end of data
+		close(pipe_to_child[writeEnd]);
 
 		char c;
 		std::string buffer;
