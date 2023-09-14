@@ -92,7 +92,7 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, c
 		heading.build_headers();
 		headers = heading.headers;
 		response = headers;
-		if (fileName.substr(fileName.rfind('.')) == ".py")
+		if (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py")
 		{
 			response += callCgi(servData, client_socket);
 		}
