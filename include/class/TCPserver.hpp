@@ -26,7 +26,7 @@
 # include <netinet/in.h>
 
 # include "Config.hpp"
-# include "Server_utils.hpp"
+# include "ServerUtils.hpp"
 
 # define MAX_BUF 4096
 
@@ -36,16 +36,18 @@ public:
 	typedef std::map<std::string, ServerInfo>::iterator info_iterator;
 
 public:
-	TCPserver(const Config& conf);
-
-	int				recvfully(int clnt);
-	void			server_loop();
-	void			sendResponse(int clnt);
-
-	~TCPserver();
+	char 								**myenv;
+	std::vector<server_t>				serverData;
+	std::vector<socket_t>				sockets;
+	std::map<int, ClientInfo>			clients;
+	std::map<std::string, std::string>	preEnv;
+	std::map<std::string, std::string>	reqstdata;
 
 private:
+	int				recvfully(int clnt);
 	int 			createSocket(const char *name, const char *port);
+	void			init_sets(fd_set& master, fd_set& wrmaster);
+	void			getSockets(const Config& conf);
 	void			setMethodToEnv(std::string);
 	void			createEnvForCGI();
 	void			mapToCharDblPtr();
@@ -54,6 +56,7 @@ private:
 	void			createSocketAndAddToSet();
 	void			setResponseFile(int client_socket, const socket_t& listen);
 	void			buildResponse(std::string &fileName, ResponseHeaders &heading, const ServerInfo servData, bool dir, int client_socket);
+	void			sendResponse(int clnt);
 	bool			thereIsNoIndexFile(ServerInfo &servData);
 	bool			isDir(std::string &dirname);
 	bool			isLocation(ServerInfo &info, std::string &name);
@@ -73,26 +76,16 @@ private:
 	std::string		find_and_set_cont_type(int client_socket);
 	std::string		correctIndexFile(std::string &filename, ServerInfo &servData);
 	std::string		listDir(std::string &dirname);	
+	std::string		callCgi(const ServerInfo& servData, int client_socket);
 	ServerInfo&		getLocationData(const socket_t& socket, const std::string& host, const std::string& route);
 	info_iterator	findLocation(const std::vector<server_t>::iterator& info, std::string route);
-	// ServerInfo		correctInfos(ServerInfo &info, std::string &name);
-
-	std::string callCgi(const ServerInfo& servData, int client_socket);
-
-
-
-private: // dve
-	void			 getSockets(const Config& conf);
-	void			 init_sets(fd_set& master, fd_set& wrmaster);
 
 public:
-	char 								**myenv;
-	std::vector<socket_t>				sockets;
-	// ResponseHeaders					resp_head; //headers // <-
-	std::map<int, ClientInfo>			clients;
-	std::map<std::string, std::string>	preEnv; // need or not
-	std::map<std::string, std::string>	reqstdata; // <-
-	std::vector<server_t>				serverData;
+	TCPserver(const Config& conf);
+
+	void			server_loop();
+
+	~TCPserver();
 };
 
 #endif // TCP_SERVER_HPP
