@@ -3,7 +3,7 @@
 TCPserver::info_iterator TCPserver::findLocation(const std::vector<server_t>::iterator& it, std::string route)
 {
 	size_t pos;
- 
+
 	while (1)
 	{
 		TCPserver::info_iterator location = it->info.location.find(route);

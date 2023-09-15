@@ -50,23 +50,24 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 				return ;
 			}
 		}
+		checkFile(fileName, heading, servData);
 	}
-	else if (clients[client_socket].method == "POST")
-	{
-		callCgi(servData, client_socket);
-		// std::fstream file((servData.uploadDir + clients[client_socket].url).c_str(), std::fstream::out);
+	// else if (clients[client_socket].method == "POST")
+	// {
+	// 	// callCgi(servData, client_socket);
+	// 	// std::fstream file((servData.uploadDir + clients[client_socket].url).c_str(), std::fstream::out);
 
-		// std::cout << (servData.uploadDir + clients[client_socket].url).c_str() << "\n";
+	// 	// std::cout << (servData.uploadDir + clients[client_socket].url).c_str() << "\n";
 
-		// if (file.fail())
-		// {
-		// 	heading.http_status = "404";
-		// 	fileName = servData.root + "/" + servData.error_pages[404];
-		// 	perror("Fstream");
-		// }
-		// else
-		// 	file << clients[client_socket].requestBody.c_str();
-	}
+	// 	// if (file.fail())
+	// 	// {
+	// 	// 	heading.http_status = "404";
+	// 	// 	fileName = servData.root + "/" + servData.error_pages[404];
+	// 	// 	perror("Fstream");
+	// 	// }
+	// 	// else
+	// 	// 	file << clients[client_socket].requestBody.c_str();
+	// }
 	else if (clients[client_socket].method == "DELETE")
 	{
 		if (std::remove((servData.uploadDir + clients[client_socket].url).c_str()) != 0)
@@ -77,7 +78,6 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 		}
 	}
 
-	checkFile(fileName, heading, servData);
 	buildResponse(fileName, heading, servData, 0, client_socket);
 }
 
@@ -92,10 +92,9 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, c
 		heading.build_headers();
 		headers = heading.headers;
 		response = headers;
-		if (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py")
-		{
+		if (clients[client_socket].method == "POST"
+				|| (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py"))
 			response += callCgi(servData, client_socket);
-		}
 		else
 			response += readFile(fileName);
 		clients[client_socket].full_path = fileName;

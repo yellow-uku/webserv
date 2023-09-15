@@ -144,9 +144,7 @@ void TCPserver::server_loop()
 						break ;
 					}
 
-					std::cout << clients[i].allRequest << "\n";
-
-
+					// std::cout << clients[i].allRequest << "\n";
 
 					setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
 					FD_SET(i, &main_write);
@@ -170,8 +168,11 @@ std::string	TCPserver::find_and_set_cont_type(int client_socket)
 {
 	if (clients[client_socket].url.find(".css") != std::string::npos)
 		return ("text/css");
-	else if (clients[client_socket].url.find(".jpg") != std::string::npos)
+	else if (clients[client_socket].url.find(".jpg") != std::string::npos
+			|| clients[client_socket].url.find(".jpeg") != std::string::npos)
 		return ("image/jpeg");
+	else if (clients[client_socket].url.find(".png") != std::string::npos)
+		return ("image/png");
 
 	//typeri checky avelacnel
 	return ("text/html");

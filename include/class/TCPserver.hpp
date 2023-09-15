@@ -28,7 +28,7 @@
 # include "Config.hpp"
 # include "ServerUtils.hpp"
 
-# define MAX_BUF 4096
+# define MAX_BUF (1024 * 1024 * 1024)
 
 class TCPserver
 {
