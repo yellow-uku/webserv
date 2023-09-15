@@ -11,7 +11,7 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 	if (pipe(pipe_to_child) == -1 or pipe(pipe_from_child) == -1)
 	{
 		perror("pipe error");
-		return "pipe error";
+		return strerror(errno);
 	}
 
 	pid_t child = fork();
@@ -19,7 +19,7 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 	if (child == -1)
 	{
 		perror("fork error");
-		return "fork error";
+		return strerror(errno);
 	}
 
 	if (child == 0)
@@ -64,8 +64,6 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 		close(pipe_from_child[readEnd]);
 
 		std::cout << "\x1B[35mBuffer: " <<  buffer << "\x1B[0m\n";
-
-		// std::cout << "Request body:" << clients[client_socket].requestBody << "\n";
 
 		waitpid(child, NULL, 0);
 
