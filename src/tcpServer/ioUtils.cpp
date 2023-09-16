@@ -16,7 +16,10 @@ size_t TCPserver::maxBodySize()
 int TCPserver::recvfully(int clnt)
 {
 	int		bytes = 0;
-	size_t	max = maxBodySize();
+	size_t	body_size = maxBodySize();
+	size_t	max = (body_size == 0 ? (body_size) : MAX_BODY_SIZE_K);
+	
+	max = max * 2; // for headers and body
 
 	char	*buff;
 	
@@ -30,7 +33,7 @@ int TCPserver::recvfully(int clnt)
 		return -1;
 	}
 
-	bytes = recv(clnt, &buff[0], max + 1, 0);
+	bytes = recv(clnt, buff, max + 1, 0);
 
 	if (bytes <= 0)
 		return bytes;
