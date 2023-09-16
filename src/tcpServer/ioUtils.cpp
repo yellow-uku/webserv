@@ -1,13 +1,36 @@
 #include "TCPserver.hpp"
 
+size_t TCPserver::maxBodySize()
+{
+	size_t max = 0;
+
+	for (size_t i = 0; i < serverData.size(); ++i)
+	{
+		if (serverData[i].info.max_body_size > max)
+			max = serverData[i].info.max_body_size;
+	}
+
+	return max;
+}
+
 int TCPserver::recvfully(int clnt)
 {
-	int bytes = 0;
+	int		bytes = 0;
+	size_t	max = maxBodySize();
 
-	// std::vector<char> buff(MAX_BUF);
-	char *buff = new char[MAX_BUF];
+	char	*buff;
+	
+	try
+	{
+		buff = new char[max];
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "new[] failed: " << e.what() << '\n';
+		return -1;
+	}
 
-	bytes = recv(clnt, &buff[0], MAX_BUF + 1, 0);
+	bytes = recv(clnt, &buff[0], max + 1, 0);
 
 	if (bytes <= 0)
 		return bytes;

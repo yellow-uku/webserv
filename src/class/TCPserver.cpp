@@ -130,16 +130,15 @@ void TCPserver::server_loop()
 				else
 				{
 					ret = recvfully(i);
-					if (ret <= 0 || ret == MAX_BUF)
+
+					if (ret <= 0)
 					{
 						close (i);
 						clients.erase(i);
 						allFd.erase(std::find(allFd.begin(), allFd.end(), i));
+
 						FD_CLR(i, &main_write);
 						FD_CLR(i, &main_read);
-
-						if (ret == MAX_BUF)
-							std::cout << "Request too large\n";
 
 						break ;
 					}

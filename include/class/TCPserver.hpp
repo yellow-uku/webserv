@@ -28,14 +28,14 @@
 # include "Config.hpp"
 # include "ServerUtils.hpp"
 
-# define MAX_BUF (1024 * 1024 * 1024)
+# define MAX_BUF (1024UL * 1024UL * 1024UL * 15UL)
 
 class TCPserver
 {
 public:
 	typedef std::map<std::string, ServerInfo>::iterator info_iterator;
 
-public:
+private:
 	char 								**myenv;
 	std::vector<server_t>				serverData;
 	std::vector<socket_t>				sockets;
@@ -67,6 +67,7 @@ private:
 	bool			checkMethod(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
 	bool			checkBodySize(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
 	size_t			urlLength(std::string &str); //<-
+	size_t			maxBodySize();
 	std::string		readLine(std::string &str, size_t &start);
 	std::string		readFile(std::string filename);
 	std::string		findFile(std::string filename);
