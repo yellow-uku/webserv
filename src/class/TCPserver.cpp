@@ -69,6 +69,11 @@ void TCPserver::server_loop()
 	fd_set main_read;
 	fd_set main_write;
 
+	struct timeval timeout;
+
+	timeout.tv_sec = 2;
+	timeout.tv_usec = 0;
+
 	struct sockaddr_in *clntAddr = NULL;
 	socklen_t clntAddrlen = sizeof(clntAddr);
 
@@ -96,10 +101,20 @@ void TCPserver::server_loop()
 		read = main_read;
 		write = main_write;
 
-		rc = select(max_fd + 1, &read, &write, NULL, NULL);
+		rc = select(max_fd + 1, &read, &write, NULL, &timeout);
 
 		if (rc == 0)
+		{
+			for (size_t i = 0; i <= max_fd; ++i)
+			{
+				if (FD_ISSET(i, &main_read))
+				{
+					// if (recv(i, )) // MSG_SEEK
+				}
+			}
+			
 			continue ;
+		}
 
 		for (int i = 3; i <= max_fd; ++i)
 		{
