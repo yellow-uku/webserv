@@ -15,9 +15,9 @@ size_t TCPserver::maxBodySize()
 
 int TCPserver::recvfully(int clnt)
 {
-	int		bytes = 0;
-	size_t	body_size = maxBodySize();
-	size_t	max = (body_size == 0 ? (body_size) : MAX_BODY_SIZE_K);
+	ssize_t	bytes = 0;
+	ssize_t	body_size = maxBodySize();
+	ssize_t	max = (body_size == 0 ? (body_size) : MAX_BODY_SIZE_K);
 	
 	max = max * 2; // for headers and body
 
@@ -29,13 +29,13 @@ int TCPserver::recvfully(int clnt)
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "new[] failed: " << e.what() << '\n';
+		std::cerr << "new[] failed: " << strerror(errno) << '\n';
 		return -1;
 	}
 
 	bytes = recv(clnt, buff, max + 1, 0);
 
-	if (bytes <= 0)
+	if (bytes <= 0 || bytes == max + 1)
 		return bytes;
 
 	buff[bytes] = '\0';
