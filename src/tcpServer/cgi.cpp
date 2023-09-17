@@ -58,10 +58,10 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 		newEnv[z++] = strdup(e);
 		newEnv[z++] = strdup(b);
 		newEnv[z] = 0;
-		for(int i = 0;myEnv[i]; ++i)
-		{
-			std::cout << myEnv[i] << "a2aaa\n";
-		}
+		// for(int i = 0;myEnv[i]; ++i)
+		// {
+		// 	std::cout << myEnv[i] << "a2aaa\n";
+		// }
 		close(pipe_to_child[writeEnd]);
 		close(pipe_from_child[readEnd]);
 
@@ -87,13 +87,13 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 
 		const char*	requestData = clients[client_socket].requestBody.c_str();
 
-		std::cout <<  "\x1B[32mBuffer: " << clients[client_socket].requestBody.size() << "\x1B[0m\n";
+		// std::cout <<  "\x1B[32mBuffer: " << clients[client_socket].requestBody.size() << "\x1B[0m\n";
 
-		for(size_t i = 0; i < clients[client_socket].requestBody.size(); i++)
-		{
-			std::cout << clients[client_socket].requestBody[i];
-		}
-		std::cout << "\n";
+		// for(size_t i = 0; i < clients[client_socket].requestBody.size(); i++)
+		// {
+		// 	std::cout << clients[client_socket].requestBody[i];
+		// }
+		// std::cout << "\n";
 
 		write(pipe_to_child[writeEnd], requestData, clients[client_socket].requestBody.size());
 		close(pipe_to_child[writeEnd]);

@@ -142,9 +142,9 @@ void TCPserver::server_loop()
 
 						break ;
 					}
-
-					// std::cout << clients[i].allRequest << "\n";
-
+					parseRequest(i);
+					std::cout << clients[i].allRequest << "\n";
+					// if (clients[i].requestHeaders.find("Content-Length"))
 					setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
 					FD_SET(i, &main_write);
 					FD_CLR(i, &main_read);
