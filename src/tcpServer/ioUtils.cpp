@@ -7,49 +7,74 @@ size_t TCPserver::maxBodySize()
 	for (size_t i = 0; i < serverData.size(); ++i)
 	{
 		if (serverData[i].info.max_body_size > max)
+		{
+			std::cout << serverData[i].info.max_body_size << "\n";
 			max = serverData[i].info.max_body_size;
+		}
 	}
 
-	return max;
+	return ((max >= INT_MAX || max == 0) ? INT_MAX - 1 : max);
 }
 
 int TCPserver::recvfully(int clnt)
 {
-	ssize_t	bytes = 0;
-	ssize_t	body_size = maxBodySize();
-	ssize_t	max = (body_size == 0 ? (body_size) : MAX_BODY_SIZE_K);
-	
-	max = max * 2; // for headers and body
+	int bytes = 0;
+	std::string rt = "";
+	std::vector<char> buff(1024*1024);
 
-	char	*buff;
-	
-	try
-	{
-		buff = new char[max];
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << "new[] failed: " << strerror(errno) << '\n';
-		return -1;
-	}
-
-	bytes = recv(clnt, buff, max + 1, 0);
-
-	if (bytes <= 0 || bytes == max + 1)
+	bytes = recv(clnt,&buff[0],buff.size(),0); //bufsize
+	if(bytes <= 0)
 		return bytes;
-
 	buff[bytes] = '\0';
-
-	for (ssize_t i = 0; i < bytes; i++)
+	for(std::vector<char>::iterator it = buff.begin(); it != buff.end(); it++)
 	{
-		clients[clnt].allRequest.push_back(buff[i]);
+		bytes--;
+		rt += *it;
+		if (bytes == -1)
+			break;
 	}
-
-	delete[] buff;
-
+	// std::cout << "recieved ->" << rt << "endl--->" << std::endl;
+	clients[clnt].allRequest = std::string(rt);
 	parseRequest(clnt);
-
 	return 1;
+	// ssize_t	bytes = 0;
+	// ssize_t	max = maxBodySize();
+
+	// char	*buff;
+	
+	// try
+	// {
+	// 	buff = new char[max + 1];
+	// }
+	// catch(const std::exception& e)
+	// {
+	// 	std::cerr << "new[] failed: " << strerror(errno) << '\n';
+	// 	return -1;
+	// }
+
+	// bytes = recv(clnt, buff, max, 0);
+
+	// if (bytes <= 0 || bytes == max + 1)
+	// {
+	// 	perror("recv");
+	// 	return bytes;
+	// }
+
+	// buff[bytes] = '\0';
+
+	// for (ssize_t i = 0; i < bytes; i++)
+	// {
+	// 	clients[clnt].allRequest.push_back(buff[i]);
+	// 	std::cout << buff[i];
+	// }
+
+	// std::cout << "buffer askdjh aksjdh kajsdh kajsdh k\n";
+
+	// delete[] buff;
+
+	// parseRequest(clnt);
+
+	// return 1;
 }
 
 void	TCPserver::sendResponse(int clnt)

@@ -83,6 +83,7 @@ private:
 
 public:
 	TCPserver(const Config& conf);
+	char			**myEnv;
 
 	void			server_loop();
 
