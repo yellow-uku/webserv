@@ -23,21 +23,6 @@ bool TCPserver::checkFile(std::string &fileName, ResponseHeaders &heading, Serve
 bool TCPserver::checkDir(std::string &dirName, ResponseHeaders &heading, ServerInfo &servData)
 {
 	struct stat fs;
-	size_t len, start = 1;
-	bool 	forwhile = true;
-	std::string dName;
-
-	// while(forwhile)
-	// {
-	// 	len = dirName.find("/",start);
-	// 	if (len == std::string::npos)
-	// 	{
-	// 		dName = dirName;
-	// 		forwhile = false;
-	// 	}
-	// 	else
-	// 		dName = dirName.substr(0,len);
-	// 	start = len + 1;
 
 	stat(dirName.c_str(), &fs);
 
@@ -47,7 +32,7 @@ bool TCPserver::checkDir(std::string &dirName, ResponseHeaders &heading, ServerI
 		heading.http_status = "403";
 		return true;
 	}
-	// } didn't work on my linux
+
 	return false;
 }
 
