@@ -2,9 +2,12 @@
 
 import cgi, os, sys
 
-a = input()
+# a = input()
 
-print(a)
+# print(a)
+
+while 1:
+	print()
 
 # form = cgi.FieldStorage()
 

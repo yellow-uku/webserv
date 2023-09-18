@@ -116,13 +116,12 @@ void TCPserver::server_loop()
 
 				if (FD_ISSET(i, &main_read) && std::find(sockets.begin(), sockets.end(), i) == sockets.end())
 				{
-					std::cout << "aaaaaa\n";
 					ssize_t b = recv(i, buf, 1, MSG_PEEK);
 
 					if (b == -1)
 					{
 						parseRequest(i);
-						std::cout << clients[i].allRequest << "\n";
+						// std::cout << clients[i].allRequest << "\n";
 						setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
 
 						acceptedFd.erase(std::find(acceptedFd.begin(), acceptedFd.end(), i));
