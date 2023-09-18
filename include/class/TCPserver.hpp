@@ -57,7 +57,7 @@ private:
 	void			createSocketAndAddToSet();
 	void			setResponseFile(int client_socket, const socket_t& listen);
 	void			buildResponse(std::string &fileName, ResponseHeaders &heading, const ServerInfo servData, bool dir, int client_socket);
-	void			sendResponse(int clnt);
+	bool			sendResponse(int clnt);
 	bool			thereIsNoIndexFile(ServerInfo &servData);
 	bool			isDir(std::string &dirname);
 	bool			isLocation(ServerInfo &info, std::string &name);

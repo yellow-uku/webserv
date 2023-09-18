@@ -96,7 +96,7 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 		// }
 		std::cout << "\n";
 
-		write(pipe_to_child[writeEnd], requestData, clients[client_socket].requestBody.size()); // SIGPIPE when child is exited before this
+		write(pipe_to_child[writeEnd], requestData, clients[client_socket].requestBody.size());
 		close(pipe_to_child[writeEnd]);
 
 		char c;

@@ -34,12 +34,19 @@ int TCPserver::recvfully(int clnt)
 	return 1;
 }
 
-void	TCPserver::sendResponse(int clnt)
+bool TCPserver::sendResponse(int clnt)
 {
-	if (send(clnt, clients[clnt].response.c_str(), clients[clnt].response.size(), 0) < 0)
+	ssize_t len = 0;
+	ssize_t size = clients[clnt].response.size();
+
+	if ((len = send(clnt, clients[clnt].response.c_str(), clients[clnt].response.size(), 0)) < 0)
 	{
 		perror("Send");
 	}
+
+	clients[clnt].response.erase(0, len);
+
+	return len == size;
 }
 
 std::string TCPserver::readFile(std::string filename)

@@ -108,88 +108,97 @@ void TCPserver::server_loop()
 
 		std::cout << "return" << rc << "\n";
 
-		if (rc == 0)
+		try
 		{
+			if (rc == 0)
+			{
+				for (int i = 3; i <= max_fd; ++i)
+				{
+					char buf[10];
+
+					if (FD_ISSET(i, &main_read) && std::find(sockets.begin(), sockets.end(), i) == sockets.end())
+					{
+						ssize_t b = recv(i, buf, 1, MSG_PEEK);
+
+						if (b == -1)
+						{
+							parseRequest(i);
+							std::cout << clients[i].allRequest << "\n";
+							setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
+
+							acceptedFd.erase(std::find(acceptedFd.begin(), acceptedFd.end(), i));
+
+							FD_SET(i, &main_write);
+							FD_CLR(i, &main_read);
+						}
+					}
+				}
+
+				continue ;
+			}
+
 			for (int i = 3; i <= max_fd; ++i)
 			{
-				char buf[10];
-
-				if (FD_ISSET(i, &main_read) && std::find(sockets.begin(), sockets.end(), i) == sockets.end())
+				if (FD_ISSET(i, &read))
 				{
-					ssize_t b = recv(i, buf, 1, MSG_PEEK);
+					std::vector<socket_t>::iterator it = std::find(sockets.begin(), sockets.end(), i);
 
-					if (b == -1)
+					if (it != sockets.end())
 					{
-						parseRequest(i);
-						// std::cout << clients[i].allRequest << "\n";
-						setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
+						int clnt = accept(i, (struct sockaddr *)clntAddr, &clntAddrlen);
 
-						acceptedFd.erase(std::find(acceptedFd.begin(), acceptedFd.end(), i));
+						if (clnt < 0)
+						{
+							std::cerr << "accept failed -> " << errno << std::endl;
+							perror("accept");
+							break ; // is this enough
+						}
 
-						FD_SET(i, &main_write);
-						FD_CLR(i, &main_read);
+						if (clnt > max_fd)
+							max_fd = clnt;
+
+						allFd.push_back(socket_t(clnt, it->host, it->port));
+						acceptedFd.push_back(clnt);
+
+						FD_SET(clnt, &main_read);
+
+						fcntl(clnt, F_SETFL, O_NONBLOCK);
+					}
+					else
+					{
+						ret = recvfully(i);
+
+						if (ret <= 0)
+						{
+							close (i);
+							clients.erase(i);
+
+							allFd.erase(std::find(allFd.begin(), allFd.end(), i));
+							acceptedFd.erase(std::find(acceptedFd.begin(), acceptedFd.end(), i));
+
+							FD_CLR(i, &main_write);
+							FD_CLR(i, &main_read);
+
+							break ;
+						}
 					}
 				}
-			}
-			
-			continue ;
-		}
-
-		for (int i = 3; i <= max_fd; ++i)
-		{
-			if (FD_ISSET(i, &read))
-			{
-				std::vector<socket_t>::iterator it = std::find(sockets.begin(), sockets.end(), i);
-
-				if (it != sockets.end())
+				if (FD_ISSET(i, &write))
 				{
-					int clnt = accept(i, (struct sockaddr *)clntAddr, &clntAddrlen);
-
-					if (clnt < 0)
-					{
-						std::cerr << "accept failed -> " << errno << std::endl;
-						perror("accept");
-						break ; // is this enough
-					}
-
-					if (clnt > max_fd)
-						max_fd = clnt;
-
-					allFd.push_back(socket_t(clnt, it->host, it->port));
-					acceptedFd.push_back(clnt);
-
-					FD_SET(clnt, &main_read);
-
-					fcntl(clnt, F_SETFL, O_NONBLOCK);
-				}
-				else
-				{
-					ret = recvfully(i);
-
-					if (ret <= 0)
+					if (sendResponse(i))
 					{
 						close (i);
-						clients.erase(i);
-
+						clients.erase(clients.find(i));
 						allFd.erase(std::find(allFd.begin(), allFd.end(), i));
-						acceptedFd.erase(std::find(acceptedFd.begin(), acceptedFd.end(), i));
-
 						FD_CLR(i, &main_write);
 						FD_CLR(i, &main_read);
-
-						break ;
 					}
 				}
 			}
-			if (FD_ISSET(i, &write))
-			{
-				sendResponse(i);
-				close (i);
-				clients.erase(clients.find(i));
-				allFd.erase(std::find(allFd.begin(), allFd.end(), i));
-				FD_CLR(i, &main_write);
-				FD_CLR(i, &main_read);
-			}
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << "Error: " << e.what() << '\n';
 		}
 	}
 }
