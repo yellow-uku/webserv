@@ -64,7 +64,7 @@ void TCPserver::server_loop()
 	int max_fd;
 	int rc, ret = 0;
 
-	fd_set temp;
+	fd_set emptySet;
 	fd_set read;
 	fd_set write;
 	fd_set main_read;
@@ -72,13 +72,12 @@ void TCPserver::server_loop()
 
 	struct timeval timeout;
 
-	FD_ZERO(&temp);
-	timeout.tv_sec = 2;
-	timeout.tv_usec = 0;
+	FD_ZERO(&emptySet);
 
 	struct sockaddr_in *clntAddr = NULL;
 	socklen_t clntAddrlen = sizeof(clntAddr);
 
+	std::vector<int> acceptedFd;
 	std::vector<socket_t> allFd;
 
 	for(std::vector<socket_t>::iterator it = sockets.begin(); it != sockets.end(); ++it)
@@ -102,8 +101,10 @@ void TCPserver::server_loop()
 	{
 		read = main_read;
 		write = main_write;
+		timeout.tv_sec = 1;
+		timeout.tv_usec = 0;
 
-		rc = select(max_fd + 1, &read, &write, NULL, &timeout);//(memcmp(&main_read, &temp, sizeof main_read) == 0 ? NULL : &timeout));
+		rc = select(max_fd + 1, &read, &write, NULL, acceptedFd.size() == 0 ? NULL : &timeout);
 
 		std::cout << "return" << rc << "\n";
 
@@ -113,14 +114,19 @@ void TCPserver::server_loop()
 			{
 				char buf[10];
 
-				if (FD_ISSET(i, &main_read))
+				if (FD_ISSET(i, &main_read) && std::find(sockets.begin(), sockets.end(), i) == sockets.end())
 				{
-					if (recv(i, buf, 1, MSG_PEEK) == 0)
+					std::cout << "aaaaaa\n";
+					ssize_t b = recv(i, buf, 1, MSG_PEEK);
+
+					if (b == -1)
 					{
 						parseRequest(i);
 						std::cout << clients[i].allRequest << "\n";
-						// if (clients[i].requestHeaders.find("Content-Length"))
 						setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
+
+						acceptedFd.erase(std::find(acceptedFd.begin(), acceptedFd.end(), i));
+
 						FD_SET(i, &main_write);
 						FD_CLR(i, &main_read);
 					}
@@ -151,6 +157,7 @@ void TCPserver::server_loop()
 						max_fd = clnt;
 
 					allFd.push_back(socket_t(clnt, it->host, it->port));
+					acceptedFd.push_back(clnt);
 
 					FD_SET(clnt, &main_read);
 
@@ -164,7 +171,9 @@ void TCPserver::server_loop()
 					{
 						close (i);
 						clients.erase(i);
+
 						allFd.erase(std::find(allFd.begin(), allFd.end(), i));
+						acceptedFd.erase(std::find(acceptedFd.begin(), acceptedFd.end(), i));
 
 						FD_CLR(i, &main_write);
 						FD_CLR(i, &main_read);

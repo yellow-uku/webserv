@@ -78,7 +78,7 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, c
 		response = headers;
 		if (clients[client_socket].method == "POST"
 				|| (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py"))
-			response += callCgi(servData, client_socket);
+			;// response += callCgi(servData, client_socket);
 		else
 			response += readFile(fileName);
 		clients[client_socket].full_path = fileName;
