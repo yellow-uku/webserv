@@ -64,6 +64,7 @@ void TCPserver::server_loop()
 	int max_fd;
 	int rc, ret = 0;
 
+	fd_set temp;
 	fd_set read;
 	fd_set write;
 	fd_set main_read;
@@ -71,6 +72,7 @@ void TCPserver::server_loop()
 
 	struct timeval timeout;
 
+	FD_ZERO(&temp);
 	timeout.tv_sec = 2;
 	timeout.tv_usec = 0;
 
@@ -101,15 +103,27 @@ void TCPserver::server_loop()
 		read = main_read;
 		write = main_write;
 
-		rc = select(max_fd + 1, &read, &write, NULL, &timeout);
+		rc = select(max_fd + 1, &read, &write, NULL, &timeout);//(memcmp(&main_read, &temp, sizeof main_read) == 0 ? NULL : &timeout));
+
+		std::cout << "return" << rc << "\n";
 
 		if (rc == 0)
 		{
-			for (size_t i = 0; i <= max_fd; ++i)
+			for (int i = 3; i <= max_fd; ++i)
 			{
+				char buf[10];
+
 				if (FD_ISSET(i, &main_read))
 				{
-					// if (recv(i, )) // MSG_SEEK
+					if (recv(i, buf, 1, MSG_PEEK) == 0)
+					{
+						parseRequest(i);
+						std::cout << clients[i].allRequest << "\n";
+						// if (clients[i].requestHeaders.find("Content-Length"))
+						setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
+						FD_SET(i, &main_write);
+						FD_CLR(i, &main_read);
+					}
 				}
 			}
 			
@@ -157,12 +171,6 @@ void TCPserver::server_loop()
 
 						break ;
 					}
-					parseRequest(i);
-					std::cout << clients[i].allRequest << "\n";
-					// if (clients[i].requestHeaders.find("Content-Length"))
-					setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
-					FD_SET(i, &main_write);
-					FD_CLR(i, &main_read);
 				}
 			}
 			if (FD_ISSET(i, &write))
