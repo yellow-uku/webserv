@@ -37,16 +37,15 @@ public:
 	typedef std::map<std::string, ServerInfo>::iterator info_iterator;
 
 private:
-	char 								**myenv;
 	std::vector<server_t>				serverData;
 	std::vector<socket_t>				sockets;
 	std::map<int, ClientInfo>			clients;
-	std::map<std::string, std::string>	preEnv;
 	std::map<std::string, std::string>	reqstdata;
 
 private:
 	int				recvfully(int clnt);
 	int 			createSocket(const char *name, const char *port);
+	void			setEnv(std::map<std::string, std::string>& env, const ServerInfo& servData, ClientInfo& client);
 	void			init_sets(fd_set& master, fd_set& wrmaster);
 	void			getSockets(const Config& conf);
 	void			setMethodToEnv(std::string);
@@ -55,7 +54,7 @@ private:
 	void			parseRequest(int client_socket);
 	void			setUrlAndMethod(int client_socket);
 	void			createSocketAndAddToSet();
-	void			setResponseFile(int client_socket, const socket_t& listen);
+	void			setResponseFile(int client_socket, socket_t& listen);
 	void			buildResponse(std::string &fileName, ResponseHeaders &heading, const ServerInfo servData, bool dir, int client_socket);
 	bool			sendResponse(int clnt);
 	bool			thereIsNoIndexFile(ServerInfo &servData);
@@ -84,7 +83,6 @@ private:
 
 public:
 	TCPserver(const Config& conf);
-	char			**myEnv;
 
 	void			server_loop();
 

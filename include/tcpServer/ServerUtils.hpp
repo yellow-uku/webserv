@@ -19,7 +19,6 @@ class ResponseHeaders
 
 struct ClientInfo
 {
-	// ssize_t								offset;
 	std::string							url;
 	std::string							query;
 	std::string							method;
@@ -34,9 +33,9 @@ struct ClientInfo
 
 struct	ServerInfo
 {
-	int									port;
 	bool								autoindex;
 	size_t								max_body_size;
+	socket_t							socket;
 	std::string							cgi;
 	std::string							root;
 	std::string							redirect; 

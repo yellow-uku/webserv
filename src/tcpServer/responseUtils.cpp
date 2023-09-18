@@ -1,6 +1,6 @@
 #include "TCPserver.hpp"
 
-void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
+void TCPserver::setResponseFile(int client_socket, socket_t& socket)
 {
 	bool				dir = false;
 	std::string			fileName;
@@ -8,6 +8,8 @@ void TCPserver::setResponseFile(int client_socket, const socket_t& socket)
 	ResponseHeaders		heading;
 
 	ServerInfo& servData = getLocationData(socket, clients[client_socket].requestHeaders["Host"], clients[client_socket].url);
+
+	servData.socket = socket;
 
 	heading.http_status = "200";
 

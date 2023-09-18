@@ -1,5 +1,29 @@
 #include "TCPserver.hpp"
 
+void TCPserver::setEnv(std::map<std::string, std::string>& env, const ServerInfo& servData, ClientInfo& client)
+{
+	env["SERVER_SOFTWARE"] = "webserv/1.0";
+	env["SERVER_NAME"] = "localhost";
+	env["GATEWAY_INTERFACE"] = "php/69420";
+
+	//REQUEST_SPECIFIC
+	
+	env["SERVER_PROTOCOL"] = "HTTP";
+	env["SERVER_PORT"] = servData.socket.port;
+	env["REQUEST_METHOD"] = client.method;
+	env["PATH_INFO"] = "";
+	env["PATH_TRANSLATED"] = "";
+	env["SCRIPT_NAME"] = "";
+	env["QUERY_STRING"] = client.query;
+	env["REMOTE_HOST"] = servData.socket.host;
+	env["REMOTE_ADDR"] = "";
+	env["AUTH_TYPE"] = "";
+	env["REMOTE_USER"] = "";
+	env["REMOTE_IDENT"] = "";
+	env["CONTENT_TYPE"] = client.requestHeaders["Content-Type"];
+	env["CONTENT_LENGTH"] = client.requestHeaders["Content-Length"];
+}
+
 std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 {
 	const int	readEnd = 0;
@@ -24,44 +48,10 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 
 	if (child == 0)
 	{
-		std::map<std::string,std::string>  customEnv;
-		std::stringstream sstr;
-		std::string key, val,newstr;
-		for(int i = 0; myEnv[i]; i++)
-		{
-			newstr += (std::string(myEnv[i]) + "\n");
-		}
-		sstr << std::string(newstr);
-		for(int i = 0;myEnv[i]; ++i)
-		{
-			std::getline(sstr,key,'=');
-			std::getline(sstr,val);
-			customEnv[key] = val;
-		}
-		char **newEnv = (char **)malloc(sizeof(char * ) * (customEnv.size() + 7));
-		int z = 0;
-		for(std::map<std::string, std::string>::iterator it = customEnv.begin(); it != customEnv.end(); ++it)
-		{
-			newEnv[z] = strdup((it->first + "=" + it->second).c_str());
-			z++;
-		}
-		const char *c = "CONTENT_TYPE=text/html";
-		const char *l = "PATH_INFO=/Users/vagevorg/Desktop/webserv/www/cgi_bin/hello.py";
-		const char *t = "SCRIPT_FILENAME=hello.py";
-		const char *e = "REQUEST_METHOD=post";
-		const char *b = "CONTENT_LENGTH=500";
+		std::map<std::string, std::string> env;
 
-		std::cout << customEnv.size() << "----" << z << "\n";
-		newEnv[z++] = strdup(c);
-		newEnv[z++] = strdup(l);
-		newEnv[z++] = strdup(t);
-		newEnv[z++] = strdup(e);
-		newEnv[z++] = strdup(b);
-		newEnv[z] = 0;
-		// for(int i = 0;myEnv[i]; ++i)
-		// {
-		// 	std::cout << myEnv[i] << "a2aaa\n";
-		// }
+		setEnv(env, servData, clients[client_socket]);
+
 		close(pipe_to_child[writeEnd]);
 		close(pipe_from_child[readEnd]);
 
@@ -73,7 +63,7 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 		char * cgiArgs[] = { const_cast<char *>(scriptPath.c_str()), NULL };
 
 		// execve(scriptPath.c_str(), cgiArgs, newEnv);
-		execve("./www/cgi_bin/hello.py", cgiArgs, newEnv);
+		execve("./www/cgi_bin/hello.py", cgiArgs, NULL);
 
 		perror("execve error");
 

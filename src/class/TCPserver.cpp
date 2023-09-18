@@ -2,8 +2,6 @@
 
 TCPserver::TCPserver(const Config& conf)
 {
-	myenv = NULL;
-
 	for(size_t i = 0; i < conf.servers.size(); ++i)
 	{
 		const Server& serv = conf.servers[i];

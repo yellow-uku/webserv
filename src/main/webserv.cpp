@@ -18,7 +18,6 @@ int main(int argc, char **argv, char **envp)
 
 		TCPserver socket(conf);
 
-		socket.myEnv = envp;
 		socket.server_loop();
 
 		return 0;
