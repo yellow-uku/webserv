@@ -1,6 +1,6 @@
 #include "TCPserver.hpp"
 
-int main(int argc, char **argv, char **env)
+int main(int argc, char **argv, char **envp)
 {
 	(void)argc;
 	(void)argv;
@@ -14,7 +14,7 @@ int main(int argc, char **argv, char **env)
 		conf.print();
 
 		TCPserver socket(conf);
-		socket.myEnv = env;
+		socket.myEnv = envp;
 		socket.server_loop();
 
 		return 0;
