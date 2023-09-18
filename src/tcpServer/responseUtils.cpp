@@ -70,17 +70,24 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, c
 	std::string response;
 	std::string headers;
 
+	int status = my_stoi(heading.http_status);
+
 	if (!dir)
 	{
 		heading.content_type = find_and_set_cont_type(client_socket);
 		heading.build_headers();
 		headers = heading.headers;
 		response = headers;
-		if (clients[client_socket].method == "POST"
-				|| (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py"))
-			response += callCgi(servData, client_socket);
-		else
+
+		if ((status >= 300 && status <= 600) || clients[client_socket].method != "POST")
 			response += readFile(fileName);
+		else if (clients[client_socket].method == "POST")
+		// if (clients[client_socket].method == "POST"
+		// 		|| (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py"))
+		// 	response += callCgi(servData, client_socket);
+		// else
+			response += readFile(fileName);
+
 		clients[client_socket].full_path = fileName;
 		clients[client_socket].response = response;
 	}
