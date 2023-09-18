@@ -22,6 +22,11 @@ void TCPserver::setEnv(std::map<std::string, std::string>& env, const ServerInfo
 	env["REMOTE_IDENT"] = "";
 	env["CONTENT_TYPE"] = client.requestHeaders["Content-Type"];
 	env["CONTENT_LENGTH"] = client.requestHeaders["Content-Length"];
+
+	for (std::map<std::string, std::string>::iterator it = env.begin(); it != env.end(); ++it)
+	{
+		
+	}
 }
 
 std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
