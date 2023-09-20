@@ -75,6 +75,24 @@ int my_stoi(const std::string& s)
 	return res;
 }
 
+// size_t?
+size_t my_stos_t(const std::string& s)
+{
+	if (s.size() > 10 || (s.size() == 10 && s > "2147483647")
+		|| std::find_if(s.begin(), s.end(), NonDigit()) != s.end())
+		return (-1);
+	
+	size_t res = 0;
+
+	for (size_t i = 0; i < s.size(); ++i)
+	{
+		res *= 10;
+		res += s[i] - 48;
+	}
+
+	return res;
+}
+
 bool socket_t::operator==(const socket_t& lhs) const { return host == lhs.host && port == lhs.port; }
 bool socket_t::operator==(const listen_t& lhs) const { return host == lhs.host && port == lhs.port; }
 bool socket_t::operator==(const int& socket) const { return fd == socket; }

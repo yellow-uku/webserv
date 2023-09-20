@@ -3,7 +3,7 @@
 int TCPserver::recvfully(int clnt)
 {
 	ssize_t	bytes = 1;
-	ssize_t	max = INT_MAX - 1;
+	ssize_t	max = 150000 - 1;
 
 	char *buff;
 
@@ -22,7 +22,7 @@ int TCPserver::recvfully(int clnt)
 	std::cout << "Bytes: " << bytes << "\n";
 
 	if (bytes <= 0)
-		return bytes;
+		return -1;
 
 	for (ssize_t i = 0; i < bytes; i++)
 	{
@@ -31,7 +31,31 @@ int TCPserver::recvfully(int clnt)
 
 	delete[] buff;
 
-	return 1;
+	if (clients[clnt].method.empty() && clients[clnt].allRequest.find("\n"))
+	{
+		clients[clnt].reqstFirstline = clients[clnt].allRequest.substr(0, clients[clnt].allRequest.find("\n"));
+		setUrlAndMethod(clnt);
+		clients[clnt].allRequest.erase(0, clients[clnt].allRequest.find("\n") + 1);
+	}
+
+	if (clients[clnt].requestHeaders.size() == 0 && clients[clnt].allRequest.find("\r\n\r\n"))
+	{
+		parseRequest(clnt);
+		clients[clnt].allRequest.erase(0, clients[clnt].allRequest.find("\r\n\r\n") + 4);
+
+		if (clients[clnt].method == "GET")
+			return 1;
+	}
+
+	if (clients[clnt].requestHeaders["Content-Length"] != "")
+	{
+		if (clients[clnt].allRequest.size() == my_stos_t(clients[clnt].requestHeaders["Content-Length"]))
+		{
+			return 1;
+		}
+	}
+
+	return 2;
 }
 
 bool TCPserver::sendResponse(int clnt)

@@ -40,6 +40,7 @@ std::ostream& operator<<(std::ostream& os, const listen_t& ls);
 std::ostream& operator<<(std::ostream& os, const socket_t& socket);
 
 int my_stoi(const std::string& s);
+size_t my_stos_t(const std::string& s);
 std::vector<std::string> splitIP(const std::string& line, int delim_count, char delim); // tox lrvi
 
 struct NonDigit

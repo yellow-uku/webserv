@@ -10,7 +10,8 @@ void TCPserver::parseRequest(int client_socket)
 
 	std::string request = clients[client_socket].allRequest;
 
-	clients[client_socket].reqstFirstline = readLine(request, start);
+	// clients[client_socket].reqstFirstline = readLine(request, start);
+
 	while (true)
 	{
 		line = readLine(request, start);
@@ -18,27 +19,29 @@ void TCPserver::parseRequest(int client_socket)
 			break ;
 	}
 
-	if (start < request.size() - 1)
-		clients[client_socket].requestBody = clients[client_socket].allRequest.substr(start);
-	else
-		clients[client_socket].requestBody = "";
+	// if (start < request.size() - 1)
+	// 	clients[client_socket].requestBody = clients[client_socket].allRequest.substr(start);
+	// else
+	// 	clients[client_socket].requestBody = "";
 
-	setUrlAndMethod(client_socket);
+	// setUrlAndMethod(client_socket);
 }
 
 std::string TCPserver::readLine(std::string &all, size_t &start)
 {
 	size_t len;
+	start = 0;
 
-	len = all.find("\n", start);
+	len = all.find("\r\n", start);
 
 	if (len == std::string::npos)
 		return "";
 
 	std::string retVal;
 
-	len = len - start + 1;
-	retVal =  all.substr(start, len);
+	retVal = all.substr(start, len);
+
+	all.erase(start, len + 2);
 
 	start += len;
 
@@ -52,28 +55,25 @@ bool TCPserver::findKeyValue(std::string &line, size_t index)
 	if (len == std::string::npos)
 		return false;
 
-	std::string kval, vval;
+	std::string key, value;
 
-	kval = line.substr(0, len);
+	key = line.substr(0, len);
 
 	while (line[len] && std::isspace(line[++len]));
 
-	vval = line.substr(len, line.find("\n"));
+	value = line.substr(len, line.find("\r\n"));
 
-	if (vval[vval.size() - 1] == '\n')
-		vval.erase(vval.size() - 1);
-
-	clients[index].requestHeaders[kval] = vval;
+	clients[index].requestHeaders[key] = value;
 
 	return true;
 }
 
 void TCPserver::setUrlAndMethod(int client_socket)
 {
-	std::stringstream	ss;
+	std::stringstream ss;
 	std::string& url = clients[client_socket].url;
 
-	ss << clients[client_socket].reqstFirstline << "\n";
+	ss << clients[client_socket].reqstFirstline;
 
 	ss >> clients[client_socket].method;
 	ss >> clients[client_socket].url;
@@ -93,6 +93,8 @@ void TCPserver::setUrlAndMethod(int client_socket)
 	std::cout << "url->" << clients[client_socket].url << std::endl;
 	std::cout << "query->" << clients[client_socket].query << std::endl;
 	std::cout << "HTTP version->" << clients[client_socket].httpVersion << std::endl << std::endl;
+
+	if (clients[client_socket].method.empty()) clients[client_socket].method = "NONE";
 }
 
 size_t TCPserver::urlLength(std::string &str)
