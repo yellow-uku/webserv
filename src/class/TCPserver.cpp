@@ -59,15 +59,15 @@ void TCPserver::init_sets(fd_set& main_read, fd_set& main_write)
 
 void TCPserver::server_loop()
 {
-	int max_fd;
-	int rc, ret = 0;
+	int rc;
+	int max_fd = INT_MIN;
 
 	fd_set read;
 	fd_set write;
 	fd_set main_read;
 	fd_set main_write;
 
-	struct sockaddr_in *clntAddr = NULL;
+	struct sockaddr_in clntAddr;
 	socklen_t clntAddrlen = sizeof(clntAddr);
 
 	std::vector<int> acceptedFd;
@@ -76,17 +76,12 @@ void TCPserver::server_loop()
 	for(std::vector<socket_t>::iterator it = sockets.begin(); it != sockets.end(); ++it)
 	{
 		std::cout << it->fd << ", " << it->host << ":" << it->port << "\n";
+
+		if (it->fd > max_fd)
+			max_fd = it->fd;
+
 		allFd.push_back(*it);
 	}
-
-	for(std::vector<socket_t>::iterator it = allFd.begin(); it != allFd.end(); it++)
-	{
-		if (it->fd > ret)
-			ret = it->fd;
-	}
-
-	max_fd = ret;
-	ret = 0;
 
 	init_sets(main_read, main_write);
 
@@ -110,7 +105,7 @@ void TCPserver::server_loop()
 
 					if (it != sockets.end())
 					{
-						int clnt = accept(i, (struct sockaddr *)clntAddr, &clntAddrlen);
+						int clnt = accept(i, (struct sockaddr *)&clntAddr, &clntAddrlen);
 
 						if (clnt < 0)
 						{
