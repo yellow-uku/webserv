@@ -62,15 +62,10 @@ void TCPserver::server_loop()
 	int max_fd;
 	int rc, ret = 0;
 
-	fd_set emptySet;
 	fd_set read;
 	fd_set write;
 	fd_set main_read;
 	fd_set main_write;
-
-	struct timeval timeout;
-
-	FD_ZERO(&emptySet);
 
 	struct sockaddr_in *clntAddr = NULL;
 	socklen_t clntAddrlen = sizeof(clntAddr);
@@ -99,41 +94,13 @@ void TCPserver::server_loop()
 	{
 		read = main_read;
 		write = main_write;
-		timeout.tv_sec = 1;
-		timeout.tv_usec = 0;
 
-		rc = select(max_fd + 1, &read, &write, NULL, NULL);//acceptedFd.size() == 0 ? NULL : &timeout);
-
-		std::cout << "return" << rc << "\n";
+		rc = select(max_fd + 1, &read, &write, NULL, NULL);
 
 		try
 		{
 			if (rc == 0)
-			{
-				// for (int i = 3; i <= max_fd; ++i)
-				// {
-				// 	char buf[10];
-
-				// 	if (FD_ISSET(i, &main_read) && std::find(sockets.begin(), sockets.end(), i) == sockets.end())
-				// 	{
-				// 		ssize_t b = recv(i, buf, 1, MSG_PEEK);
-
-				// 		if (b == -1)
-				// 		{
-				// 			parseRequest(i);
-				// 			std::cout << clients[i].allRequest << "\n";
-				// 			setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
-
-				// 			acceptedFd.erase(std::find(acceptedFd.begin(), acceptedFd.end(), i));
-
-				// 			FD_SET(i, &main_write);
-				// 			FD_CLR(i, &main_read);
-				// 		}
-				// 	}
-				// }
-
 				continue ;
-			}
 
 			for (int i = 3; i <= max_fd; ++i)
 			{
