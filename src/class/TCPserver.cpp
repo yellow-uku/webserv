@@ -46,7 +46,7 @@ TCPserver::TCPserver(const Config& conf)
 	getSockets(conf);
 }
 
-void TCPserver::init_sets(fd_set& main_read, fd_set& main_write)
+void TCPserver::initFdSets(fd_set& main_read, fd_set& main_write)
 {
 	FD_ZERO(&main_read);
 	FD_ZERO(&main_write);
@@ -83,7 +83,7 @@ void TCPserver::server_loop()
 		allFd.push_back(*it);
 	}
 
-	init_sets(main_read, main_write);
+	initFdSets(main_read, main_write);
 
 	while(1)
 	{
@@ -125,7 +125,7 @@ void TCPserver::server_loop()
 					}
 					else
 					{
-						int res = recvfully(i);
+						int res = receive(i);
 
 						if (res == 1)
 						{
@@ -168,7 +168,7 @@ void TCPserver::server_loop()
 	}
 }
 
-std::string	TCPserver::find_and_set_cont_type(int client_socket)
+std::string	TCPserver::setContentType(int client_socket)
 {
 	if (clients[client_socket].url.find(".css") != std::string::npos)
 		return ("text/css");

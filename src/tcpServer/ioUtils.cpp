@@ -1,6 +1,6 @@
 #include "TCPserver.hpp"
 
-int TCPserver::recvfully(int clnt)
+int TCPserver::receive(int clnt)
 {
 	ssize_t	bytes = 1;
 	ssize_t	max = 150000 - 1;
@@ -33,26 +33,28 @@ int TCPserver::recvfully(int clnt)
 
 	if (clients[clnt].method.empty() && clients[clnt].allRequest.find("\n"))
 	{
-		clients[clnt].reqstFirstline = clients[clnt].allRequest.substr(0, clients[clnt].allRequest.find("\n"));
 		setUrlAndMethod(clnt);
-		clients[clnt].allRequest.erase(0, clients[clnt].allRequest.find("\n") + 1);
 	}
 
 	if (clients[clnt].requestHeaders.size() == 0 && clients[clnt].allRequest.find("\r\n\r\n"))
 	{
 		parseRequest(clnt);
-		clients[clnt].allRequest.erase(0, clients[clnt].allRequest.find("\r\n\r\n") + 4);
 
-		if (clients[clnt].method == "GET")
+		if (clients[clnt].method != "POST")
 			return 1;
 	}
 
-	if (clients[clnt].requestHeaders["Content-Length"] != "")
+	if (!clients[clnt].requestHeaders["Content-Length"].empty())
 	{
 		if (clients[clnt].allRequest.size() == my_stos_t(clients[clnt].requestHeaders["Content-Length"]))
 		{
+			clients[clnt].requestBody = clients[clnt].allRequest;
 			return 1;
 		}
+	}
+	else if (clients[clnt].requestHeaders["Transfer-Encoding"] == "chunked")
+	{
+		// parse chunked request;
 	}
 
 	return 2;

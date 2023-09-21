@@ -23,11 +23,10 @@ struct ClientInfo
 	std::string							query;
 	std::string							method;
 	std::string							response;
-	std::string							full_path;
+	std::string							fullPath;
 	std::string							allRequest;
 	std::string							requestBody;
 	std::string							httpVersion;
-	std::string							reqstFirstline;
 	std::map<std::string,std::string>	requestHeaders;
 };
 

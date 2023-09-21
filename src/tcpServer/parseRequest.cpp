@@ -2,48 +2,34 @@
 
 void TCPserver::parseRequest(int client_socket)
 {
-	size_t start = 0;
-
-	std::string key, value;
-
-	std::string line;
+	std::string line, key, value;
 
 	std::string request = clients[client_socket].allRequest;
 
-	// clients[client_socket].reqstFirstline = readLine(request, start);
-
 	while (true)
 	{
-		line = readLine(request, start);
+		line = readLine(request);
 		if (!findKeyValue(line, client_socket))
 			break ;
 	}
 
-	// if (start < request.size() - 1)
-	// 	clients[client_socket].requestBody = clients[client_socket].allRequest.substr(start);
-	// else
-	// 	clients[client_socket].requestBody = "";
-
-	// setUrlAndMethod(client_socket);
+	clients[client_socket].allRequest.erase(0, clients[client_socket].allRequest.find("\r\n\r\n") + 4);
 }
 
-std::string TCPserver::readLine(std::string &all, size_t &start)
+std::string TCPserver::readLine(std::string &all)
 {
 	size_t len;
-	start = 0;
 
-	len = all.find("\r\n", start);
+	len = all.find("\r\n");
 
 	if (len == std::string::npos)
 		return "";
 
 	std::string retVal;
 
-	retVal = all.substr(start, len);
+	retVal = all.substr(0, len);
 
-	all.erase(start, len + 2);
-
-	start += len;
+	all.erase(0, len + 2);
 
 	return retVal;
 }
@@ -73,7 +59,10 @@ void TCPserver::setUrlAndMethod(int client_socket)
 	std::stringstream ss;
 	std::string& url = clients[client_socket].url;
 
-	ss << clients[client_socket].reqstFirstline;
+	std::string firstLine = clients[client_socket].allRequest.substr(0, clients[client_socket].allRequest.find("\n"));
+	clients[client_socket].allRequest.erase(0, clients[client_socket].allRequest.find("\n") + 1);
+
+	ss << firstLine;
 
 	ss >> clients[client_socket].method;
 	ss >> clients[client_socket].url;
@@ -94,7 +83,8 @@ void TCPserver::setUrlAndMethod(int client_socket)
 	std::cout << "query->" << clients[client_socket].query << std::endl;
 	std::cout << "HTTP version->" << clients[client_socket].httpVersion << std::endl << std::endl;
 
-	if (clients[client_socket].method.empty()) clients[client_socket].method = "NONE";
+	if (clients[client_socket].method.empty())
+		clients[client_socket].method = "NONE";
 }
 
 size_t TCPserver::urlLength(std::string &str)

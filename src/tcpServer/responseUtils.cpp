@@ -77,7 +77,7 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, c
 
 	if (!dir)
 	{
-		heading.content_type = find_and_set_cont_type(client_socket);
+		heading.content_type = setContentType(client_socket);
 		heading.build_headers();
 		headers = heading.headers;
 		response = headers;
@@ -92,7 +92,7 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, c
 		// 		|| (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py"))
 		// 	response += callCgi(servData, client_socket);
 
-		clients[client_socket].full_path = fileName;
+		clients[client_socket].fullPath = fileName;
 		clients[client_socket].response = response;
 	}
 	else
@@ -102,6 +102,6 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, c
 		response = headers;
 		response += listDir(fileName);
 		clients[client_socket].response = response;
-		clients[client_socket].full_path = fileName;
+		clients[client_socket].fullPath = fileName;
 	}
 }

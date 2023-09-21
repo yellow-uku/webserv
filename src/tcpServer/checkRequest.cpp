@@ -41,8 +41,3 @@ bool TCPserver::isRedirect(ResponseHeaders &headData, ServerInfo &servData, int 
 
 	return true;
 }
-
-bool TCPserver::isLocation(ServerInfo &info, std::string &name)
-{
-	return info.location.count(name);
-}

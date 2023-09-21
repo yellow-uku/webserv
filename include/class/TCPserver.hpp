@@ -43,43 +43,40 @@ private:
 	std::map<std::string, std::string>	reqstdata;
 
 private:
-	int				recvfully(int clnt);
-	int 			createSocket(const char *name, const char *port);
-	void			setEnv(std::map<std::string, std::string>& env, const ServerInfo& servData, ClientInfo& client);
-	void			init_sets(fd_set& master, fd_set& wrmaster);
+	int				createSocket(const char *name, const char *port);
+	void			initFdSets(fd_set& master, fd_set& wrmaster);
 	void			getSockets(const Config& conf);
-	void			setMethodToEnv(std::string);
-	void			createEnvForCGI();
-	void			mapToCharDblPtr();
+
+private:
+	int				receive(int clnt);
 	void			parseRequest(int client_socket);
 	void			setUrlAndMethod(int client_socket);
-	void			createSocketAndAddToSet();
 	void			setResponseFile(int client_socket, socket_t& listen);
 	void			buildResponse(std::string &fileName, ResponseHeaders &heading, const ServerInfo servData, bool dir, int client_socket);
+	bool			findKeyValue(std::string &, size_t );
 	bool			sendResponse(int clnt);
-	bool			thereIsNoIndexFile(ServerInfo &servData);
-	bool			isDir(std::string &dirname);
-	bool			isLocation(ServerInfo &info, std::string &name);
-	bool 			isRedirect(ResponseHeaders &headers, ServerInfo &info, int client_socket);
-	bool 			findKeyValue(std::string &, size_t );
-	bool			checkFile(std::string &fileName, ResponseHeaders & heading, ServerInfo &servData);
-	bool			checkDir(std::string &dirName, ResponseHeaders & heading, ServerInfo &servData);
+	std::string		setContentType(int client_socket);
+	std::string		readLine(std::string &str);
+
+private:
 	bool			checkMethod(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
 	bool			checkBodySize(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
-	size_t			urlLength(std::string &str); //<-
-	size_t			maxBodySize();
-	std::string		readLine(std::string &str, size_t &start);
-	std::string		readFile(std::string filename);
-	std::string		findFile(std::string filename);
-	std::string		getMethod();
-	std::string		getUrl();
-	std::string		gethttpvers();
-	std::string		find_and_set_cont_type(int client_socket);
+	bool			isRedirect(ResponseHeaders &headers, ServerInfo &info, int client_socket);
+	void			setEnv(std::map<std::string, std::string>& env, const ServerInfo& servData, ClientInfo& client);
+	size_t			urlLength(std::string &str);
 	std::string		correctIndexFile(std::string &filename, ServerInfo &servData);
-	std::string		listDir(std::string &dirname);	
 	std::string		callCgi(const ServerInfo& servData, int client_socket);
+
+private:
 	ServerInfo&		getLocationData(const socket_t& socket, const std::string& host, const std::string& route);
 	info_iterator	findLocation(const std::vector<server_t>::iterator& info, std::string route);
+
+private:
+	bool			isDir(std::string &dirname);
+	bool			checkFile(std::string &fileName, ResponseHeaders & heading, ServerInfo &servData);
+	bool			checkDir(std::string &dirName, ResponseHeaders & heading, ServerInfo &servData);
+	std::string		readFile(std::string filename);
+	std::string		listDir(std::string &dirname);
 
 public:
 	TCPserver(const Config& conf);
