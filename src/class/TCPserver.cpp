@@ -15,11 +15,11 @@ TCPserver::TCPserver(const Config& conf)
 		servinfo.info.error_pages = serv.getErrorPages();
 		servinfo.info.max_body_size = serv.getMaxBodySize();
 		servinfo.info.root = serv.getRoot();
-		servinfo.info.cgi = "/usr/local/bin/python3"; // ??
+		servinfo.info.cgi = DEFAULT_CGI;
 		servinfo.info.redirect = "";
-		servinfo.info.uploadDir = serv.getRoot() + "/upload/";
+		servinfo.info.uploadDir = serv.getRoot() + UPLOAD_DIRECTORY;
 		servinfo.info.autoindex = false;
-		servinfo.info.index_files.push_back("index.html");
+		servinfo.info.index_files.push_back(DEFAULT_INDEX);
 
 		servinfo.info.allow_methods.push_back("GET");
 		servinfo.info.allow_methods.push_back("POST");
@@ -92,10 +92,15 @@ void TCPserver::server_loop()
 
 		rc = select(max_fd + 1, &read, &write, NULL, NULL);
 
+		std::cout << "select: " << rc << "\n";
+
 		try
 		{
-			if (rc == 0)
+			if (rc < 0)
+			{
+				perror("Select error");
 				continue ;
+			}
 
 			for (int i = 3; i <= max_fd; ++i)
 			{
@@ -109,8 +114,7 @@ void TCPserver::server_loop()
 
 						if (clnt < 0)
 						{
-							std::cerr << "accept failed -> " << errno << std::endl;
-							perror("accept");
+							perror("Accept error");
 							break ; // is this enough
 						}
 
@@ -129,6 +133,10 @@ void TCPserver::server_loop()
 
 						if (res == 1)
 						{
+							for (std::map<std::string, std::string>::iterator it = clients[i].requestHeaders.begin(); it != clients[i].requestHeaders.end(); ++it)
+							{
+								std::cout << it->first << ": " << it->second << "\n";
+							}
 							setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
 
 							FD_SET(i, &main_write);
@@ -197,3 +205,16 @@ std::string TCPserver::correctIndexFile(std::string &fileName, ServerInfo &servD
 }
 
 TCPserver::~TCPserver() { }
+
+// struct timeval timeout = {0, 0};
+// timeout.tv_sec = 10;
+// timeout.tv_usec = 0;
+// for (int i = 3; i <= max_fd; ++i)
+// {
+	// 	std::vector<socket_t>::iterator it = std::find(sockets.begin(), sockets.end(), i);
+
+	// 	if (FD_ISSET(i, &main_read) && it == sockets.end())
+	// 	{
+	// 		close(i);
+	// 	}
+// }

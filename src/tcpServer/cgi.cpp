@@ -22,9 +22,9 @@ char * const *TCPserver::setEnv(std::map<std::string, std::string>& env, const S
 	env["SERVER_PROTOCOL"] = "HTTP";
 	env["SERVER_PORT"] = servData.socket.port;
 	env["REQUEST_METHOD"] = client.method;
-	env["PATH_INFO"] = servData.root + client.fullPath;
-	env["PATH_TRANSLATED"] = "";
-	env["SCRIPT_NAME"] = "";
+	env["PATH_INFO"] = servData.root + client.url;
+	env["PATH_TRANSLATED"] = servData.root + client.url;
+	env["SCRIPT_NAME"] = servData.root + client.url;
 	env["QUERY_STRING"] = client.query;
 	env["REMOTE_HOST"] = servData.socket.host;
 	env["REMOTE_ADDR"] = "";

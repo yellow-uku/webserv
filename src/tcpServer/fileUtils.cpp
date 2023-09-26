@@ -71,7 +71,7 @@ std::string TCPserver::listDir(std::string &name)
 	if(folder == NULL)
 	{
 		perror("Opendir");
-		return "not found";
+		return strerror(errno);
 	}
 
 	while( (entry = readdir(folder)) )

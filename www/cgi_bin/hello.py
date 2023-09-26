@@ -17,6 +17,6 @@ print (os.environ)
 # else:
 #    message = 'Uploading Failed'
 
-print("Content-Type: text/html;charset=utf-8")
-print ("Content-type:text/html\r\n")
-print("<H1> " + "hjkjhkjh" + " </H1>")
+# print("Content-Type: text/html;charset=utf-8")
+# print ("Content-type:text/html\r\n")
+# print("<H1> " + "hjkjhkjh" + " </H1>")
