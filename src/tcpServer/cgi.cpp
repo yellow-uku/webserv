@@ -15,14 +15,14 @@ char * const *TCPserver::setEnv(std::map<std::string, std::string>& env, const S
 {
 	env["SERVER_SOFTWARE"] = "webserv/1.0";
 	env["SERVER_NAME"] = "localhost";
-	env["GATEWAY_INTERFACE"] = "php/69420";
+	env["GATEWAY_INTERFACE"] = "python/69.420";
 
 	//REQUEST_SPECIFIC
-	
+
 	env["SERVER_PROTOCOL"] = "HTTP";
 	env["SERVER_PORT"] = servData.socket.port;
 	env["REQUEST_METHOD"] = client.method;
-	env["PATH_INFO"] = "";
+	env["PATH_INFO"] = servData.root + client.fullPath;
 	env["PATH_TRANSLATED"] = "";
 	env["SCRIPT_NAME"] = "";
 	env["QUERY_STRING"] = client.query;
