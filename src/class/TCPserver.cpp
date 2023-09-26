@@ -15,7 +15,7 @@ TCPserver::TCPserver(const Config& conf)
 		servinfo.info.error_pages = serv.getErrorPages();
 		servinfo.info.max_body_size = serv.getMaxBodySize();
 		servinfo.info.root = serv.getRoot();
-		servinfo.info.cgi = "/bin/ls"; // ??
+		servinfo.info.cgi = "/usr/local/bin/python3"; // ??
 		servinfo.info.redirect = "";
 		servinfo.info.uploadDir = serv.getRoot() + "/upload/";
 		servinfo.info.autoindex = false;

@@ -82,15 +82,13 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, c
 		headers = heading.headers;
 		response = headers;
 
-		if ((status >= 300 && status <= 600) || clients[client_socket].method != "POST")
+		if ((status >= 300 && status <= 600) || clients[client_socket].method == "DELETE")
 			response += readFile(fileName);
-		else if (clients[client_socket].method == "POST")
-		{
-
-		}
-		// if (clients[client_socket].method == "POST"
-		// 		|| (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py"))
-		// 	response += callCgi(servData, client_socket);
+		if (clients[client_socket].method == "POST"
+				|| (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py"))
+			response += callCgi(servData, client_socket);
+		else
+			response += readFile(fileName);
 
 		clients[client_socket].fullPath = fileName;
 		clients[client_socket].response = response;

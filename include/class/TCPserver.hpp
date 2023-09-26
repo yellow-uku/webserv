@@ -62,7 +62,7 @@ private:
 	bool			checkMethod(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
 	bool			checkBodySize(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
 	bool			isRedirect(ResponseHeaders &headers, ServerInfo &info, int client_socket);
-	void			setEnv(std::map<std::string, std::string>& env, const ServerInfo& servData, ClientInfo& client);
+	char * const *	setEnv(std::map<std::string, std::string>& env, const ServerInfo& servData, ClientInfo& client);
 	size_t			urlLength(std::string &str);
 	std::string		correctIndexFile(std::string &filename, ServerInfo &servData);
 	std::string		callCgi(const ServerInfo& servData, int client_socket);

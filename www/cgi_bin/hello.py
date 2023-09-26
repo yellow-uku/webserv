@@ -1,13 +1,9 @@
-#!/usr/local/bin/python3
-
 import cgi, os, sys
 
 # a = input()
-
-# print(a)
-
-while 1:
-	print()
+print (os.environ)
+# while 1:
+# 	print()
 
 # form = cgi.FieldStorage()
 
@@ -21,6 +17,6 @@ while 1:
 # else:
 #    message = 'Uploading Failed'
 
-# print("Content-Type: text/html;charset=utf-8")
-# print ("Content-type:text/html\r\n")
-# print("<H1> " + message + " </H1>")
+print("Content-Type: text/html;charset=utf-8")
+print ("Content-type:text/html\r\n")
+print("<H1> " + "hjkjhkjh" + " </H1>")
