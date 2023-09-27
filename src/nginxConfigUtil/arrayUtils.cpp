@@ -39,14 +39,3 @@ const int ConfigParser::error_page_numbers[] = {
 	413,
 	0,
 };
-
-bool ConfigParser::contains(char const * const allowed[], const std::string &token)
-{
-	for (size_t i = 0; allowed[i]; ++i)
-	{
-		if (token == allowed[i])
-			return true;
-	}
-
-	return false;
-}

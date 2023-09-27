@@ -49,8 +49,6 @@ private:
 	static char const * const	array_value_directives_location[];
 	static char const * const	single_value_directives_location[];
 
-	bool	contains(char const * const allowed_tokens[], const std::string& token);
-
 private:
 	void	getHosts();
 	void	generateTokens(const std::string &file);

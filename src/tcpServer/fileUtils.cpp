@@ -7,13 +7,11 @@ bool TCPserver::checkFile(std::string &fileName, ResponseHeaders &heading, Serve
 
 	if(access(fileName.c_str(), F_OK) == -1)
 	{
-		fileName = servData.root + "/" + servData.error_pages[404];
 		heading.http_status = "404";
 		return true;
 	}
 	else if(!(S_IROTH & fs.st_mode))
 	{
-		fileName = servData.root + "/" + servData.error_pages[403];
 		heading.http_status = "403";
 		return true;
 	}
@@ -28,7 +26,6 @@ bool TCPserver::checkDir(std::string &dirName, ResponseHeaders &heading, ServerI
 
 	if (!(S_IXOTH & fs.st_mode))
 	{
-		dirName = servData.root + "/" + servData.error_pages[403];
 		heading.http_status = "403";
 		return true;
 	}

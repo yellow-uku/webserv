@@ -1,5 +1,12 @@
 #include "TCPserver.hpp"
 
+const char *ClientInfo::allowed_content_type[] = {
+	"image/jpeg",
+	"image/png",
+	"multipart/form-data",
+	NULL,
+};
+
 TCPserver::TCPserver(const Config& conf)
 {
 	for(size_t i = 0; i < conf.servers.size(); ++i)
@@ -190,7 +197,7 @@ std::string	TCPserver::setContentType(int client_socket)
 	return ("text/html");
 }
 
-std::string TCPserver::correctIndexFile(std::string &fileName, ServerInfo &servData)
+std::string TCPserver::correctIndexFile(std::string &fileName, ServerInfo &servData, ResponseHeaders& headers)
 {
 	std::string full_path;
 
@@ -201,7 +208,8 @@ std::string TCPserver::correctIndexFile(std::string &fileName, ServerInfo &servD
 			return full_path;
 	}
 
-	return servData.root + "/" + servData.error_pages[403];
+	headers.http_status = "403";
+	return "";
 }
 
 TCPserver::~TCPserver() { }

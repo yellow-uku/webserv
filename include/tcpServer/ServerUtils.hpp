@@ -28,6 +28,8 @@ struct ClientInfo
 	std::string							requestBody;
 	std::string							httpVersion;
 	std::map<std::string,std::string>	requestHeaders;
+
+	static const char *allowed_content_type[];
 };
 
 struct	ServerInfo

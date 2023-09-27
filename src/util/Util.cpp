@@ -34,7 +34,7 @@ std::vector<std::string> splitIP(const std::string& line, int delim_count, char 
 	return ret;
 }
 
-std::string my_to_string(int num)
+std::string my_to_string(ssize_t num)
 {
 	size_t pos = 0;
 	std::string ret;
@@ -91,6 +91,17 @@ size_t my_stos_t(const std::string& s)
 	}
 
 	return res;
+}
+
+bool contains(char const * const allowed[], const std::string &token)
+{
+	for (size_t i = 0; allowed[i]; ++i)
+	{
+		if (token == allowed[i])
+			return true;
+	}
+
+	return false;
 }
 
 bool socket_t::operator==(const socket_t& lhs) const { return host == lhs.host && port == lhs.port; }

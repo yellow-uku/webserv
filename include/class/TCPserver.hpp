@@ -52,7 +52,7 @@ private:
 	void			parseRequest(int client_socket);
 	void			setUrlAndMethod(int client_socket);
 	void			setResponseFile(int client_socket, socket_t& listen);
-	void			buildResponse(std::string &fileName, ResponseHeaders &heading, const ServerInfo servData, bool dir, int client_socket);
+	void			buildResponse(std::string &fileName, ResponseHeaders &heading, ServerInfo servData, bool dir, int client_socket);
 	bool			findKeyValue(std::string &, size_t );
 	bool			sendResponse(int clnt);
 	std::string		setContentType(int client_socket);
@@ -62,10 +62,10 @@ private:
 	bool			checkMethod(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
 	bool			checkBodySize(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
 	bool			isRedirect(ResponseHeaders &headers, ServerInfo &info, int client_socket);
-	char * const *	setEnv(std::map<std::string, std::string>& env, const ServerInfo& servData, ClientInfo& client);
 	size_t			urlLength(std::string &str);
-	std::string		correctIndexFile(std::string &filename, ServerInfo &servData);
+	std::string		correctIndexFile(std::string &filename, ServerInfo &servData, ResponseHeaders& heading);
 	std::string		callCgi(const ServerInfo& servData, int client_socket);
+	char * const *	setEnv(std::map<std::string, std::string>& env, const ServerInfo& servData, ClientInfo& client);
 
 private:
 	ServerInfo&		getLocationData(const socket_t& socket, const std::string& host, const std::string& route);
@@ -77,6 +77,12 @@ private:
 	bool			checkDir(std::string &dirName, ResponseHeaders & heading, ServerInfo &servData);
 	std::string		readFile(std::string filename);
 	std::string		listDir(std::string &dirname);
+
+private:
+	void			postImage();
+	void			postMultipart(std::string requestBody, std::string boundary, ResponseHeaders &headers);
+	void			parsePostRequest(ClientInfo& client, ResponseHeaders& headers);
+	std::string		getBoundary(std::string contentType, ResponseHeaders& headers);
 
 public:
 	TCPserver(const Config& conf);

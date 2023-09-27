@@ -9,7 +9,6 @@ bool TCPserver::checkMethod(std::string &fileName, ResponseHeaders &heading, Ser
 	}
 
 	heading.http_status = "405";
-	fileName = servData.root + "/" + servData.error_pages[405];
 	return false;
 }
 
@@ -18,7 +17,6 @@ bool TCPserver::checkBodySize(std::string &fileName, ResponseHeaders &heading, S
 	if (servData.max_body_size != 0 && clients[client_socket].requestBody.size() > servData.max_body_size)
 	{
 		heading.http_status = "413";
-		fileName = servData.root + "/" + servData.error_pages[413];
 
 		return true;
 	}
