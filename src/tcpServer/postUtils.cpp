@@ -55,6 +55,8 @@ void TCPserver::parsePostRequest(ClientInfo& client, ResponseHeaders& headers)
 	std::string type = client.requestHeaders["Content-Type"];
 	std::string boundary = "--" + getBoundary(type, headers);
 
+	type = type.find(';') != std::string::npos ? type.substr(0, type.find(';')) : type;
+
 	if (boundary == "--" || !contains(ClientInfo::allowed_content_type, type))
 		headers.http_status = "400";
 }
