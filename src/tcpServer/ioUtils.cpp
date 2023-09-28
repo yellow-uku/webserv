@@ -1,6 +1,6 @@
 #include "TCPserver.hpp"
 
-int TCPserver::receive(int clnt)
+int TCPserver::receive(ClientInfo& client, int clnt)
 {
 	ssize_t	bytes = 1;
 	ssize_t	max = 150000 - 1;
@@ -26,33 +26,33 @@ int TCPserver::receive(int clnt)
 
 	for (ssize_t i = 0; i < bytes; i++)
 	{
-		clients[clnt].allRequest.push_back(buff[i]);
+		client.allRequest.push_back(buff[i]);
 	}
 
 	delete[] buff;
 
-	if (clients[clnt].method.empty() && clients[clnt].allRequest.find("\n"))
+	if (client.method.empty() && client.allRequest.find("\n"))
 	{
-		setUrlAndMethod(clnt);
+		setUrlAndMethod(client);
 	}
 
-	if (clients[clnt].requestHeaders.size() == 0 && clients[clnt].allRequest.find("\r\n\r\n"))
+	if (client.requestHeaders.size() == 0 && client.allRequest.find("\r\n\r\n"))
 	{
-		parseRequest(clnt);
+		parseRequest(client);
 
-		if (clients[clnt].method != "POST")
+		if (client.method != "POST")
 			return 1;
 	}
 
-	if (!clients[clnt].requestHeaders["Content-Length"].empty())
+	if (!client.requestHeaders["Content-Length"].empty())
 	{
-		if (clients[clnt].allRequest.size() == my_stos_t(clients[clnt].requestHeaders["Content-Length"]))
+		if (client.allRequest.size() == my_stos_t(client.requestHeaders["Content-Length"]))
 		{
-			clients[clnt].requestBody = clients[clnt].allRequest;
+			client.requestBody = client.allRequest;
 			return 1;
 		}
 	}
-	else if (clients[clnt].requestHeaders["Transfer-Encoding"] == "chunked")
+	else if (client.requestHeaders["Transfer-Encoding"] == "chunked")
 	{
 		// parse chunked request;
 	}

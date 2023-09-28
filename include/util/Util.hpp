@@ -50,4 +50,9 @@ struct NonDigit
 	bool operator()(char c);
 };
 
+struct IsNotSpace
+{
+	bool operator()(char c);
+};
+
 #endif // UTIL_HPP

@@ -1,6 +1,6 @@
 #include "TCPserver.hpp"
 
-int main(int argc, char **argv, char **envp)
+int main(int argc, char **argv)
 {
 	Config conf(argc > 1 ? argv[1] : DEFAULT_FILE_PATH);
 

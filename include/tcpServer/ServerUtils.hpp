@@ -24,6 +24,7 @@ struct ClientInfo
 	std::string							method;
 	std::string							response;
 	std::string							fullPath;
+	std::string							boundary;
 	std::string							allRequest;
 	std::string							requestBody;
 	std::string							httpVersion;

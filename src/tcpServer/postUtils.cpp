@@ -1,28 +1,36 @@
 #include "TCPserver.hpp"
 
-std::string	TCPserver::getBoundary(std::string contentType, ResponseHeaders& headers)
+void TCPserver::parsePostRequest(ClientInfo& client, ResponseHeaders& headers)
+{
+	std::string type = client.requestHeaders["Content-Type"];
+	client.boundary = "--" + getBoundary(type);
+
+	type = type.find(';') != std::string::npos ? type.substr(0, type.find(';')) : type;
+
+	if (client.boundary == "--"
+			|| !contains(ClientInfo::allowed_content_type, type)
+			|| client.requestBody.find(client.boundary + "--") == std::string::npos)
+		headers.http_status = "400";
+}
+
+std::string	TCPserver::getBoundary(std::string contentType)
 {
 	size_t index = contentType.find("boundary=");
 
 	if (index == contentType.npos)
-	{
 		return "";
-	}
 
 	return (contentType.substr(index + 9));
 }
 
-void TCPserver::postMultipart(std::string requestBody, std::string boundary, ResponseHeaders &headers)
+bool TCPserver::postMultipart(std::string& requestBody, std::string& boundary, std::string& upload)
 {
-	size_t final = requestBody.find(boundary + "--");
-	if (final == requestBody.npos)
-	{
-		headers.http_status = "400";
-		return ;
-	}
+	size_t start_index = 0;
 
-	size_t	start_index = 0;
-	for (;;)
+	int err = 0;
+	bool fail = false;
+
+	while (1)
 	{
 		size_t start = requestBody.find(boundary , start_index) + boundary.size();
 
@@ -31,18 +39,24 @@ void TCPserver::postMultipart(std::string requestBody, std::string boundary, Res
 
 		size_t end = requestBody.find(boundary, start);
 
-		std::string temp = requestBody.substr(start, end - start + 1);
+		std::string temp = requestBody.substr(start, end - start);
 
-		std::string a = temp.substr(temp.find("\r\n\r\n") + 4);
+		std::string headers = temp.substr(0, temp.find("\r\n\r\n"));
 
-		std::fstream file((my_to_string(time(NULL)) + ".png").c_str(), std::ios::out | std::ios::binary);
-	
-		file << a;
+		std::cout << headers << "--------------\n";
 
-		std::cout << "|" << a << "|" << std::endl;
+		std::string body = temp.substr(temp.find("\r\n\r\n") + 4);
+
+		if ((err = parseBody(body, headers, upload)))
+		{
+			std::cerr << "File upload error: " << strerror(err) << "\n";
+			fail = true;
+		}
 
 		start_index = end;
 	}
+
+	return fail;
 }
 
 void TCPserver::postImage()
@@ -50,13 +64,58 @@ void TCPserver::postImage()
 
 }
 
-void TCPserver::parsePostRequest(ClientInfo& client, ResponseHeaders& headers)
+int TCPserver::parseBody(std::string& body, std::string& headers, std::string& upload)
 {
-	std::string type = client.requestHeaders["Content-Type"];
-	std::string boundary = "--" + getBoundary(type, headers);
+	size_t filenamePos = headers.find("filename=\"") == std::string::npos ? std::string::npos : headers.find("filename=\"") + 10;
 
-	type = type.find(';') != std::string::npos ? type.substr(0, type.find(';')) : type;
+	size_t endPos = headers.find('\"', filenamePos);
 
-	if (boundary == "--" || !contains(ClientInfo::allowed_content_type, type))
-		headers.http_status = "400";
+	std::string filename = (filenamePos == std::string::npos ? "" : headers.substr(filenamePos, endPos - filenamePos));
+
+	std::cout << "filename: " << filename << "\n";
+
+	size_t contentPos = ((headers.find("Content-Type:") == std::string::npos) ? std::string::npos : headers.find("Content-Type:") + 13);
+
+	while (contentPos != std::string::npos && std::isspace(headers[contentPos++])) ;
+
+	std::string type = (contentPos == std::string::npos ? "" : headers.substr(contentPos - 1, headers.find("\r\n", contentPos) - contentPos));
+
+	return uploadFile(filename, type, body, upload);
 }
+
+int TCPserver::uploadFile(std::string& filename, std::string& type, std::string& body, std::string& upload)
+{
+	std::string extension = ".mdd";
+	size_t extensionPos = filename.rfind('.');
+
+	if (type == "image/jpeg")
+		extension = ".jpg";
+	else if (type == "image/png")
+		extension = ".png";
+
+	if (std::find_if(body.begin(), body.end(), IsNotSpace()) == body.end())
+		return 0;
+
+	filename = extensionPos == std::string::npos ? filename : filename.substr(0, filename.rfind('.'));
+
+	if (filename.empty())
+		filename = "download";
+
+	std::string temp = filename;
+
+	for (size_t i = 1; access((upload + filename + extension).c_str(), F_OK) == 0; ++i)
+	{
+		filename = temp + " (" + my_to_string(i) + ")";
+	}
+
+	std::fstream file((upload + filename + extension).c_str(), std::ios::out | std::ios::binary);
+
+	if (file.fail())
+		return errno;
+
+	file << body;
+
+	return 0;
+}
+// return "<center> <h1> Error uploading file: " + std::string(strerror(errno)) + " </h1> </center>";
+// return "<center> <h1> File " + filename + extension + " uploaded! </h1> </center>";

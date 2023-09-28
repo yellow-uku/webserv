@@ -1,6 +1,6 @@
 #include "TCPserver.hpp"
 
-bool TCPserver::checkFile(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData)
+bool TCPserver::checkFile(std::string &fileName, ResponseHeaders &heading)
 {
 	struct stat fs;
 	stat(fileName.c_str(),&fs);
@@ -18,7 +18,7 @@ bool TCPserver::checkFile(std::string &fileName, ResponseHeaders &heading, Serve
 	return false;
 }
 
-bool TCPserver::checkDir(std::string &dirName, ResponseHeaders &heading, ServerInfo &servData)
+bool TCPserver::checkDir(std::string &dirName, ResponseHeaders &heading)
 {
 	struct stat fs;
 

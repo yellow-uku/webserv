@@ -48,23 +48,23 @@ private:
 	void			getSockets(const Config& conf);
 
 private:
-	int				receive(int clnt);
-	void			parseRequest(int client_socket);
-	void			setUrlAndMethod(int client_socket);
-	void			setResponseFile(int client_socket, socket_t& listen);
-	void			buildResponse(std::string &fileName, ResponseHeaders &heading, ServerInfo servData, bool dir, int client_socket);
-	bool			findKeyValue(std::string &, size_t );
+	int				receive(ClientInfo& client, int clnt);
+	void			parseRequest(ClientInfo& client);
+	void			setUrlAndMethod(ClientInfo& client);
+	void			setResponseFile(ClientInfo& client, socket_t& listen);
+	void			buildResponse(std::string& fileName, ResponseHeaders &heading, ServerInfo servData, bool dir, ClientInfo& client);
+	bool			findKeyValue(std::string& line, ClientInfo& client);
 	bool			sendResponse(int clnt);
-	std::string		setContentType(int client_socket);
+	std::string		setContentType(ClientInfo& client);
 	std::string		readLine(std::string &str);
 
 private:
-	bool			checkMethod(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
-	bool			checkBodySize(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket);
-	bool			isRedirect(ResponseHeaders &headers, ServerInfo &info, int client_socket);
+	bool			checkMethod(ResponseHeaders &heading, ServerInfo &servData, ClientInfo& client);
+	bool			checkBodySize(ResponseHeaders &heading, ServerInfo &servData, ClientInfo& client);
+	bool			isRedirect(ResponseHeaders &headers, ServerInfo &info, ClientInfo& client);
 	size_t			urlLength(std::string &str);
 	std::string		correctIndexFile(std::string &filename, ServerInfo &servData, ResponseHeaders& heading);
-	std::string		callCgi(const ServerInfo& servData, int client_socket);
+	std::string		callCgi(const ServerInfo& servData, ClientInfo& client);
 	char * const *	setEnv(std::map<std::string, std::string>& env, const ServerInfo& servData, ClientInfo& client);
 
 private:
@@ -73,16 +73,19 @@ private:
 
 private:
 	bool			isDir(std::string &dirname);
-	bool			checkFile(std::string &fileName, ResponseHeaders & heading, ServerInfo &servData);
-	bool			checkDir(std::string &dirName, ResponseHeaders & heading, ServerInfo &servData);
+	bool			checkFile(std::string &fileName, ResponseHeaders & heading);
+	bool			checkDir(std::string &dirName, ResponseHeaders & heading);
 	std::string		readFile(std::string filename);
 	std::string		listDir(std::string &dirname);
 
 private:
+	int				uploadFile(std::string& filename, std::string& type, std::string& body, std::string& upload);
+	int				parseBody(std::string& body, std::string& headers, std::string& upload);
 	void			postImage();
-	void			postMultipart(std::string requestBody, std::string boundary, ResponseHeaders &headers);
 	void			parsePostRequest(ClientInfo& client, ResponseHeaders& headers);
-	std::string		getBoundary(std::string contentType, ResponseHeaders& headers);
+	bool			postMultipart(std::string& requestBody, std::string& boundary, std::string& uplaod);
+	std::string		getBoundary(std::string contentType);
+
 
 public:
 	TCPserver(const Config& conf);

@@ -49,7 +49,7 @@ char * const *TCPserver::setEnv(std::map<std::string, std::string>& env, const S
 	return envp;
 }
 
-std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
+std::string TCPserver::callCgi(const ServerInfo& servData, ClientInfo& client)
 {
 	const int readEnd = 0;
 	const int writeEnd = 1;
@@ -75,7 +75,7 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 	{
 		std::map<std::string, std::string> env;
 
-		char * const *envp = setEnv(env, servData, clients[client_socket]);
+		char * const *envp = setEnv(env, servData, client);
 
 		close(pipe_to_child[writeEnd]);
 		close(pipe_from_child[readEnd]);
@@ -83,7 +83,7 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 		dup2(pipe_to_child[readEnd], STDIN_FILENO);
 		dup2(pipe_from_child[writeEnd], STDOUT_FILENO);
 
-		std::string scriptPath = (servData.root + clients[client_socket].url);
+		std::string scriptPath = (servData.root + client.url);
 
 		char * cgiArgs[] = { const_cast<char *>(servData.cgi.c_str()), const_cast<char *>(scriptPath.c_str()), NULL };
 
@@ -100,11 +100,11 @@ std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
 	close(pipe_to_child[readEnd]);
 	close(pipe_from_child[writeEnd]);
 
-	const char*	requestData = clients[client_socket].requestBody.c_str();
+	const char*	requestData = client.requestBody.c_str();
 
-	std::cout <<  "\x1B[32mBuffer: " << clients[client_socket].requestBody.size() << "\x1B[0m\n";
+	std::cout <<  "\x1B[32mBuffer: " << client.requestBody.size() << "\x1B[0m\n";
 
-	write(pipe_to_child[writeEnd], requestData, clients[client_socket].requestBody.size());
+	write(pipe_to_child[writeEnd], requestData, client.requestBody.size());
 	close(pipe_to_child[writeEnd]);
 
 	char c;

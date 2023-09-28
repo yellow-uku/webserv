@@ -28,6 +28,7 @@ char const * const ConfigParser::error_pages[] = {
 	"error_pages/404.html",
 	"error_pages/405.html",
 	"error_pages/413.html",
+	"error_pages/500.html",
 	NULL,
 };
 
@@ -37,5 +38,6 @@ const int ConfigParser::error_page_numbers[] = {
 	404,
 	405,
 	413,
+	500,
 	0,
 };

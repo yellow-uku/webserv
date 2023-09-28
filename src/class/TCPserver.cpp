@@ -136,7 +136,7 @@ void TCPserver::server_loop()
 					}
 					else
 					{
-						int res = receive(i);
+						int res = receive(clients[i], i);
 
 						if (res == 1)
 						{
@@ -144,7 +144,7 @@ void TCPserver::server_loop()
 							{
 								std::cout << it->first << ": " << it->second << "\n";
 							}
-							setResponseFile(i, *(std::find(allFd.begin(), allFd.end(), i)));
+							setResponseFile(clients[i], *(std::find(allFd.begin(), allFd.end(), i)));
 
 							FD_SET(i, &main_write);
 							FD_CLR(i, &main_read);
@@ -183,14 +183,14 @@ void TCPserver::server_loop()
 	}
 }
 
-std::string	TCPserver::setContentType(int client_socket)
+std::string	TCPserver::setContentType(ClientInfo& client)
 {
-	if (clients[client_socket].url.find(".css") != std::string::npos)
+	if (client.url.find(".css") != std::string::npos)
 		return ("text/css");
-	else if (clients[client_socket].url.find(".jpg") != std::string::npos
-			|| clients[client_socket].url.find(".jpeg") != std::string::npos)
+	else if (client.url.find(".jpg") != std::string::npos
+			|| client.url.find(".jpeg") != std::string::npos)
 		return ("image/jpeg");
-	else if (clients[client_socket].url.find(".png") != std::string::npos)
+	else if (client.url.find(".png") != std::string::npos)
 		return ("image/png");
 
 	//typeri checky avelacnel

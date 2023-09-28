@@ -1,10 +1,10 @@
 #include "TCPserver.hpp"
 
-bool TCPserver::checkMethod(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket)
+bool TCPserver::checkMethod(ResponseHeaders &heading, ServerInfo &servData, ClientInfo& client)
 {
 	for (size_t i = 0; i < servData.allow_methods.size(); ++i)
 	{
-		if (servData.allow_methods[i] == clients[client_socket].method)
+		if (servData.allow_methods[i] == client.method)
 			return true;
 	}
 
@@ -12,9 +12,9 @@ bool TCPserver::checkMethod(std::string &fileName, ResponseHeaders &heading, Ser
 	return false;
 }
 
-bool TCPserver::checkBodySize(std::string &fileName, ResponseHeaders &heading, ServerInfo &servData, int client_socket)
+bool TCPserver::checkBodySize(ResponseHeaders &heading, ServerInfo &servData, ClientInfo& client)
 {	
-	if (servData.max_body_size != 0 && clients[client_socket].requestBody.size() > servData.max_body_size)
+	if (servData.max_body_size != 0 && client.requestBody.size() > servData.max_body_size)
 	{
 		heading.http_status = "413";
 
@@ -23,14 +23,14 @@ bool TCPserver::checkBodySize(std::string &fileName, ResponseHeaders &heading, S
 	return false;
 }
 
-bool TCPserver::isRedirect(ResponseHeaders &headData, ServerInfo &servData, int client_socket)//poxel prototype
+bool TCPserver::isRedirect(ResponseHeaders &headData, ServerInfo &servData, ClientInfo& client)//poxel prototype
 {
-	if(!servData.redirect.size() || clients[client_socket].url == servData.redirect)
+	if(!servData.redirect.size() || client.url == servData.redirect)
 		return false;
 
 	(void) headData;
 
-	clients[client_socket].response = "HTTP/1.1 307 Temporary Redirect\r\n"
+	client.response = "HTTP/1.1 307 Temporary Redirect\r\n"
 	"Location: " + servData.redirect + "\r\n"
 	"Content-Length: 0\r\n"
 	"Connection: close\r\n"

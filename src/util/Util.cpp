@@ -17,6 +17,11 @@ bool NonDigit::operator()(char c)
 	return !::isdigit(c);
 }
 
+bool IsNotSpace::operator()(char c)
+{
+	return !std::isspace(c);
+}
+
 std::vector<std::string> splitIP(const std::string& line, int delim_count, char delim) // tox lrvi
 {
 	std::stringstream ss(line);
