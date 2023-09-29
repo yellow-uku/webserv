@@ -133,7 +133,7 @@ void TCPserver::callCgi(ServerInfo& servData, ClientInfo& client, std::string& r
 	else
 	{
 		kill(child, SIGKILL);
-		response += readFile(servData.root + servData.error_pages[500]); // change this to timeout error
+		response += readFile(servData.root + servData.error_pages[408]);
 	}
 
 	close(pipe_from_child[readEnd]);
