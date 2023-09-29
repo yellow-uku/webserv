@@ -11,7 +11,7 @@ char *ft_strdup(const std::string& s)
 	return temp;
 }
 
-char * const *TCPserver::setEnv(std::map<std::string, std::string>& env, const ServerInfo& servData, ClientInfo& client)
+char * const *TCPserver::setEnv(std::map<std::string, std::string>& env, ServerInfo& servData, ClientInfo& client)
 {
 	env["SERVER_SOFTWARE"] = "webserv/1.0";
 	env["SERVER_NAME"] = "localhost";
@@ -49,8 +49,10 @@ char * const *TCPserver::setEnv(std::map<std::string, std::string>& env, const S
 	return envp;
 }
 
-std::string TCPserver::callCgi(const ServerInfo& servData, ClientInfo& client)
+void TCPserver::callCgi(ServerInfo& servData, ClientInfo& client, std::string& response)
 {
+	signal(SIGPIPE, SIG_IGN);
+
 	const int readEnd = 0;
 	const int writeEnd = 1;
 
@@ -60,7 +62,7 @@ std::string TCPserver::callCgi(const ServerInfo& servData, ClientInfo& client)
 	if (pipe(pipe_to_child) == -1 || pipe(pipe_from_child) == -1)
 	{
 		perror("pipe error");
-		return strerror(errno);
+		response += readFile(servData.root + servData.error_pages[500]);
 	}
 
 	pid_t child = fork();
@@ -68,7 +70,7 @@ std::string TCPserver::callCgi(const ServerInfo& servData, ClientInfo& client)
 	if (child == -1)
 	{
 		perror("fork error");
-		return strerror(errno);
+		response += readFile(servData.root + servData.error_pages[500]);
 	}
 
 	if (child == 0)
@@ -82,6 +84,7 @@ std::string TCPserver::callCgi(const ServerInfo& servData, ClientInfo& client)
 
 		dup2(pipe_to_child[readEnd], STDIN_FILENO);
 		dup2(pipe_from_child[writeEnd], STDOUT_FILENO);
+		dup2(pipe_from_child[writeEnd], STDERR_FILENO);
 
 		std::string scriptPath = (servData.root + client.url);
 
@@ -91,8 +94,8 @@ std::string TCPserver::callCgi(const ServerInfo& servData, ClientInfo& client)
 
 		delete[] envp;
 
-		perror("execve error");
-		std::cout << strerror(errno) << "\n";
+		perror((servData.cgi + scriptPath + ": execve error").c_str());
+		std::cout << strerror(errno) << ": " << servData.cgi + scriptPath << "\n";
 
 		exit(1);
 	}
@@ -102,100 +105,47 @@ std::string TCPserver::callCgi(const ServerInfo& servData, ClientInfo& client)
 
 	const char*	requestData = client.requestBody.c_str();
 
-	std::cout <<  "\x1B[32mBuffer: " << client.requestBody.size() << "\x1B[0m\n";
+	std::cout <<  "\x1B[32mBuffer: " << client.requestBody << "\x1B[0m\n";
 
-	write(pipe_to_child[writeEnd], requestData, client.requestBody.size());
+	if (client.method != "GET")
+		write(pipe_to_child[writeEnd], requestData, client.requestBody.size());
+
 	close(pipe_to_child[writeEnd]);
 
 	char c;
 	std::string buffer;
 	ssize_t bytesRead;
 
-	while ((bytesRead = read(pipe_from_child[readEnd], &c, 1)) > 0)
+	fd_set child_fd;
+	struct timeval timeout = {5, 0}; // wait 5 seconds before killing the child
+
+	FD_ZERO(&child_fd);
+	FD_SET(pipe_from_child[readEnd], &child_fd);
+
+	if (select(pipe_from_child[readEnd] + 1, &child_fd, NULL, NULL, &timeout) > 0)
 	{
-		buffer.push_back(c);
+		while ((bytesRead = read(pipe_from_child[readEnd], &c, 1)) > 0)
+		{
+			buffer.push_back(c);
+		}
+		response += buffer;
+	}
+	else
+	{
+		kill(child, SIGKILL);
+		response += readFile(servData.root + servData.error_pages[500]); // change this to timeout error
 	}
 
 	close(pipe_from_child[readEnd]);
 
-	std::cout << "\x1B[35mBuffer: " <<  buffer << "\x1B[0m\n";
-
 	waitpid(child, NULL, 0);
-
-	return buffer;
 }
 
-// #include "TCPserver.hpp"
-
-// std::string TCPserver::callCgi(const ServerInfo& servData, int client_socket)
+// while ((a = select(pipe_from_child[readEnd] + 1, &child_fd, NULL, NULL, &timeout)) == 0)
 // {
-// 	const int	readEnd = 0;
-// 	const int	writeEnd = 1;
-
-// 	int pipe_to_child[2];
-// 	int pipe_from_child[2];
-
-// 	if (pipe(pipe_to_child) == -1 or pipe(pipe_from_child) == -1)
-// 	{
-// 		perror("pipe error");
-// 		return strerror(errno);
-// 	}
-
-// 	pid_t child = fork();
-
-// 	if (child == -1)
-// 	{
-// 		perror("fork error");
-// 		return strerror(errno);
-// 	}
-
-// 	if (child == 0)
-// 	{
-// 		close(pipe_to_child[writeEnd]);
-// 		close(pipe_from_child[readEnd]);
-
-// 		dup2(pipe_to_child[readEnd], STDIN_FILENO);
-// 		dup2(pipe_from_child[writeEnd], STDOUT_FILENO);
-
-// 		std::string scriptPath = (servData.root + clients[client_socket].url);
-
-// 		char * cgiArgs[] = { const_cast<char *>(scriptPath.c_str()), NULL };
-
-// 		execve(scriptPath.c_str(), cgiArgs, NULL);
-
-// 		perror("execve error");
-
-// 		std::cout << strerror(errno) << "\n";
-
-// 		exit(1);
-// 	}
-// 	else
-// 	{
-// 		close(pipe_to_child[readEnd]);
-// 		close(pipe_from_child[writeEnd]);
-
-// 		const char*	requestData = clients[client_socket].requestBody.c_str();
-
-// 		write(pipe_to_child[writeEnd], requestData, strlen(requestData));
-// 		close(pipe_to_child[writeEnd]);
-
-// 		char c;
-// 		std::string buffer;
-// 		ssize_t bytesRead;
-
-// 		while ((bytesRead = read(pipe_from_child[readEnd], &c, 1)) > 0)
-// 		{
-// 			buffer.push_back(c);
-// 		}
-
-// 		close(pipe_from_child[readEnd]);
-
-// 		std::cout << "\x1B[35mBuffer: " <<  buffer << "\x1B[0m\n";
-
-// 		waitpid(child, NULL, 0);
-
-// 		return buffer;
-// 	}
-
-// 	return "";
+// 	// std::cout << a << " barev\n";
+// 	// FD_SET(pipe_from_child[readEnd], &child_fd);
+// 	// timeout.tv_sec = 5;
+// 	// break ;
+// 	close(pipe_from_child[readEnd]);
 // }

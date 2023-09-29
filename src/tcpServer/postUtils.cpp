@@ -88,7 +88,9 @@ int TCPserver::uploadFile(std::string& filename, std::string& type, std::string&
 	std::string extension = ".mdd";
 	size_t extensionPos = filename.rfind('.');
 
-	if (type == "image/jpeg")
+	if (extensionPos != std::string::npos && extensionPos != filename.size() - 1)
+		extension = filename.substr(extensionPos);
+	else if (type == "image/jpeg")
 		extension = ".jpg";
 	else if (type == "image/png")
 		extension = ".png";

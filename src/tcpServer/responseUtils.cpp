@@ -89,13 +89,10 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, S
 			response += readFile(servData.root + servData.error_pages[status]);
 		else
 		{
-			if (client.method == "GET")
-			{
-				if (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py")
-					response += callCgi(servData, client);
-				else
-					response += readFile(fileName);
-			}
+			if (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py")
+				callCgi(servData, client, response);
+			else if (client.method == "GET")
+				response += readFile(fileName);
 			else if (client.method == "POST")
 			{
 				std::string type = client.requestHeaders["Content-Type"];
