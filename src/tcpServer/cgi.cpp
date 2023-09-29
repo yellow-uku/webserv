@@ -51,7 +51,7 @@ char * const *TCPserver::setEnv(std::map<std::string, std::string>& env, ServerI
 
 void TCPserver::callCgi(ServerInfo& servData, ClientInfo& client, std::string& response)
 {
-	signal(SIGPIPE, SIG_IGN);
+	// signal(SIGPIPE, SIG_IGN);
 
 	const int readEnd = 0;
 	const int writeEnd = 1;
@@ -64,6 +64,8 @@ void TCPserver::callCgi(ServerInfo& servData, ClientInfo& client, std::string& r
 		perror("pipe error");
 		response += readFile(servData.root + servData.error_pages[500]);
 	}
+
+	fcntl(pipe_to_child[writeEnd], F_SETFL, O_NONBLOCK, O_CLOEXEC);
 
 	pid_t child = fork();
 
@@ -103,21 +105,26 @@ void TCPserver::callCgi(ServerInfo& servData, ClientInfo& client, std::string& r
 	close(pipe_to_child[readEnd]);
 	close(pipe_from_child[writeEnd]);
 
+	fd_set child_fd;
+	struct timeval timeout = {5, 0}; // wait before writing to the child
 	const char*	requestData = client.requestBody.c_str();
 
-	std::cout <<  "\x1B[32mBuffer: " << client.requestBody << "\x1B[0m\n";
+	FD_ZERO(&child_fd);
+	FD_SET(pipe_from_child[writeEnd], &child_fd);
 
 	if (client.method != "GET")
-		write(pipe_to_child[writeEnd], requestData, client.requestBody.size());
-
+	{
+		// select(pipe_to_child[writeEnd] + 1, NULL, &child_fd, NULL, &timeout)
+		write(pipe_to_child[writeEnd], requestData, 1000); /// while ?
+	}
+	std::cout << "---B\n";
 	close(pipe_to_child[writeEnd]);
 
 	char c;
 	std::string buffer;
 	ssize_t bytesRead;
 
-	fd_set child_fd;
-	struct timeval timeout = {5, 0}; // wait 5 seconds before killing the child
+	timeout.tv_sec = 5; // 5 seconds for killing the child
 
 	FD_ZERO(&child_fd);
 	FD_SET(pipe_from_child[readEnd], &child_fd);

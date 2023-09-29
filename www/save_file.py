@@ -1,9 +1,8 @@
 #!/usr/bin/python
 
-while 1:
-	pass
+import cgi, os, sys
+print("helllloooooooooooooooooooooooooo" + sys.stdin.read())
 
-# import cgi, os
 # import cgitb; cgitb.enable()
 # form = cgi.FieldStorage()
 # # Get filename here.

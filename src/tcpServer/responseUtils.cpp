@@ -33,7 +33,9 @@ void TCPserver::setResponseFile(ClientInfo& client, socket_t& socket)
 		return ;
 	}
 
-	if (client.requestHeaders["Content-Length"].empty() && client.requestHeaders["Transfer-Encoding"].empty())
+	if (client.method == "POST"
+		&& client.requestHeaders["Content-Length"].empty()
+		&& client.requestHeaders["Transfer-Encoding"].empty())
 	{
 		heading.http_status = "411";
 		buildResponse(fileName, heading, servData, 0, client);
