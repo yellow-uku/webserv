@@ -82,7 +82,7 @@ private:
 	int				uploadFile(std::string& filename, std::string& type, std::string& body, std::string& upload);
 	int				parseBody(std::string& body, std::string& headers, std::string& upload);
 	void			postImage();
-	void			parsePostRequest(ClientInfo& client, ResponseHeaders& headers);
+	void			parsePostRequest(ClientInfo& client, ResponseHeaders& headers, std::string& type);
 	bool			postMultipart(std::string& requestBody, std::string& boundary, std::string& uplaod);
 	std::string		getBoundary(std::string contentType);
 

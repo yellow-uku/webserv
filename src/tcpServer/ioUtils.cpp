@@ -56,6 +56,8 @@ int TCPserver::receive(ClientInfo& client, int clnt)
 	{
 		// parse chunked request;
 	}
+	else
+		return 1; // error, no length
 
 	return 2;
 }

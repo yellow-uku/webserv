@@ -24,10 +24,18 @@ void TCPserver::setResponseFile(ClientInfo& client, socket_t& socket)
 		return ;
 	}
 
-	if (client.url == "" || client.httpVersion != "HTTP/1.1"
-		|| client.requestHeaders["Host"] == "")
+	if (client.url.empty() || client.httpVersion != "HTTP/1.1"
+		|| client.requestHeaders["Host"].empty())
 	{
 		heading.http_status = "400";
+		buildResponse(fileName, heading, servData, 0, client);
+
+		return ;
+	}
+
+	if (client.requestHeaders["Content-Length"].empty() && client.requestHeaders["Transfer-Encoding"].empty())
+	{
+		heading.http_status = "411";
 		buildResponse(fileName, heading, servData, 0, client);
 
 		return ;
@@ -70,11 +78,12 @@ void TCPserver::setResponseFile(ClientInfo& client, socket_t& socket)
 
 void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, ServerInfo servData, bool dir, ClientInfo& client)
 {
+	std::string type;
 	std::string response;
 
 	if (client.method == "POST")
 	{
-		parsePostRequest(client, heading);
+		parsePostRequest(client, heading, type);
 	}
 
 	int status = my_stoi(heading.http_status);
@@ -95,9 +104,6 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, S
 				response += readFile(fileName);
 			else if (client.method == "POST")
 			{
-				std::string type = client.requestHeaders["Content-Type"];
-				type = type.find(';') != std::string::npos ? type.substr(0, type.find(';')) : type;
-
 				if (type == "multipart/form-data")
 				{
 					if (postMultipart(client.requestBody, client.boundary, servData.uploadDir))

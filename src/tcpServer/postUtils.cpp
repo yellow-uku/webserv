@@ -1,15 +1,15 @@
 #include "TCPserver.hpp"
 
-void TCPserver::parsePostRequest(ClientInfo& client, ResponseHeaders& headers)
+void TCPserver::parsePostRequest(ClientInfo& client, ResponseHeaders& headers, std::string& type)
 {
-	std::string type = client.requestHeaders["Content-Type"];
+	type = client.requestHeaders["Content-Type"];
 	client.boundary = "--" + getBoundary(type);
 
 	type = type.find(';') != std::string::npos ? type.substr(0, type.find(';')) : type;
 
-	if (client.boundary == "--"
-			|| !contains(ClientInfo::allowed_content_type, type)
-			|| client.requestBody.find(client.boundary + "--") == std::string::npos)
+	if (!contains(ClientInfo::allowed_content_type, type)
+		|| (type == "multipart/form-data" && (client.boundary == "--"
+		|| client.requestBody.find(client.boundary + "--") == std::string::npos)))
 		headers.http_status = "400";
 }
 
