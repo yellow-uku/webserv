@@ -51,8 +51,6 @@ bool TCPserver::postMultipart(std::string& requestBody, std::string& boundary, s
 
 		std::string headers = temp.substr(0, temp.find("\r\n\r\n"));
 
-		std::cout << headers << "--------------\n";
-
 		std::string body = temp.substr(temp.find("\r\n\r\n") + 4);
 
 		if ((err = parseBody(body, headers, upload)))
@@ -110,8 +108,6 @@ int TCPserver::parseBody(std::string& body, std::string& headers, std::string& u
 	size_t endPos = headers.find('\"', filenamePos);
 
 	std::string filename = (filenamePos == std::string::npos ? "" : headers.substr(filenamePos, endPos - filenamePos));
-
-	std::cout << "filename: " << filename << "\n";
 
 	size_t contentPos = ((headers.find("Content-Type:") == std::string::npos) ? std::string::npos : headers.find("Content-Type:") + 13);
 

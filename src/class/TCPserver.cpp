@@ -107,7 +107,6 @@ void TCPserver::server_loop()
 
 			for (size_t i = 0; i < allFd.size(); ++i)
 			{
-				std::cout << "checking socket: " << allFd[i].fd << "\n";
 				if (FD_ISSET(allFd[i].fd, &main_read) && std::find(sockets.begin(), sockets.end(), allFd[i].fd) == sockets.end())
 				{
 					if (time(NULL) - allFd[i].timeout >= SOCKET_TIMEOUT)
@@ -155,7 +154,6 @@ void TCPserver::server_loop()
 					}
 					else
 					{
-						std::cout << "socket " << i << " tries to receive\n";
 						int res = receive(clients[i], i, *(std::find(allFd.begin(), allFd.end(), i)));
 
 						if (res == 1)

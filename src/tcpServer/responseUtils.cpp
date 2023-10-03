@@ -47,8 +47,6 @@ void TCPserver::setResponseFile(ClientInfo& client, socket_t& socket)
 		{
 			std::string index = correctIndexFile(fileName, servData, heading);
 
-			std::cout << "index: " << index << "\n";
-
 			if (checkDir(fileName, heading))
 			{
 				buildResponse(fileName, heading, servData, 0, client);

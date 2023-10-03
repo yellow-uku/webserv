@@ -11,8 +11,6 @@ int main(int argc, char **argv)
 
 		TCPserver socket(conf);
 
-		std::cout << hex_to_int("F") << "\n";
-
 		socket.server_loop();
 
 		return 0;

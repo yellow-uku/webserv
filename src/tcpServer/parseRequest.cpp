@@ -109,8 +109,6 @@ void TCPserver::parseChunked(ClientInfo& client, size_t max_body_size)
 
 		std::string body = request.substr(start + hex.size() + 2, num);
 
-		std::cout << body << "\n";
-
 		start += hex.size() + 2 + num + 2;
 
 		if (start >= request.size())

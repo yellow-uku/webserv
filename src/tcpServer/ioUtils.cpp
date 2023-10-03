@@ -25,10 +25,6 @@ int TCPserver::receive(ClientInfo& client, int clnt, socket_t& socket)
 		return bytes;
 	}
 
-	std::cout << "socket " << clnt << " performed a read: " << buf << "\n";
-
- 	// std::cout << "Bytes: " << bytes << "\n";
-
 	socket.timeout = time(NULL);
 
 	for (ssize_t i = 0; i < bytes; i++)
@@ -64,7 +60,6 @@ int TCPserver::receive(ClientInfo& client, int clnt, socket_t& socket)
 	}
 	else if (client.requestHeaders["Transfer-Encoding"] == "chunked")
 	{
-		std::cout << "ischunked\n";
 		if (client.allRequest.find("\r\n0\r\n") != std::string::npos)
 		{
 			ServerInfo& servData = getLocationData(socket, client.requestHeaders["Host"], client.url);
