@@ -1,0 +1,65 @@
+# ------------------------ Short usage description --------------------------- #
+#
+# Directives:
+#	Each directive must start with directive name after followed by its value 
+#	or values and ended with ';' symbol.
+#
+# Separators:
+#	Each element can be separated from other element with 1 or more whitespaces.
+#	Whitespace is one of this " \n\r\t\h\f".
+#
+# Location:
+#	Server can have multiple locations, and location can also have nested locations.
+#	Location can have this directives: root, index, autoindex, error_page, cgi,
+#		client_max_body_size, allow_methods, upload_dir, location, return.
+#
+# Directive list:
+#	server_name	-	Can have multiple values.
+#					Example: server_name localhost car otherNames;
+#
+#	listen		-	IP and/or PORT.
+#					Example: listen 8080;
+#					Example: listen 127.0.0.1:8080;
+#					Example: listen localhost:8080;
+#					Example: listen 127.0.0.1;
+#
+#	root		-	Can have only one value,
+#					and end with or without '/' symbol.
+#					Example: root www/html;
+#					Example: root www/html/;
+#
+#	index		-	Can have multiple values.
+#					Example: index index.html index.php index.py;
+#
+#	autoindex	-	Can have only 'on' or 'off' value. By default it is 'off'.
+#					Example: autoindex on;
+#
+#	error_page	-	Must started with 1 or more error numbers and ended with path.
+#					Error numbers range is - [300-600).
+#					Example: error_page 404 404.html;
+#					Example: error_page 501 504 544 500.html;
+#
+#	client_max_body_size - can have value in bytes, in kilobytes or in megabytes.
+#					Example: client_max_body_size 1024;		<- in bytes
+#					Example: client_max_body_size 1024k;	<- in kilobytes
+#					Example: client_max_body_size 1024K;	<- in kilobytes
+#					Example: client_max_body_size 1024m;	<- in megabytes
+#					Example: client_max_body_size 1024M;	<- in megabytes
+#
+#	cgi			-	Must start with CGI extension name and followed by CGI path.
+#					Example: cgi php /usr/bin/php-cgi;
+#					Example: cgi py	/usr/bin/py-cgi;
+#
+#	allow_methods -	The list of allowed methods which can be GET, POST or DELETE.
+#					Example: GET;
+#					Example: DELETE GET;
+#
+#	upload_dir	-	Path for the uploaded files.
+#					Example: upload_dir /Imgs/;
+#
+#	return		-	Path to the redirection site or path.
+#					Must start with 'http://', 'https://' or '/'.
+#					Example: return /team.html;
+#					Example: return http://google.com;
+#
+# ---------------------------------------------------------------------------- #
