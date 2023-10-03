@@ -222,13 +222,20 @@ void ConfigParser::parseLocations(std::vector<std::string> &tokens)
 	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); ++it)
 	{
 		const std::vector<std::string> names = it->getServerNames();
-	
-		for (size_t j = 0; j < names.size(); ++j)
+
+		const std::vector<listen_t> listens = it->getListens();
+
+		for (std::vector<listen_t>::const_iterator lst = listens.begin(); lst != listens.end(); ++lst)
 		{
-			for (std::vector<Server>::iterator it2 = it + 1; it2 != servers.end(); ++it2)
+			std::vector<Server>::iterator serv = std::find(it + 1, servers.end(), *lst);
+
+			if (serv != servers.end())
 			{
-				if (names[j] != "" && std::find(it2, servers.end(), names[j]) != servers.end())
-					throw std::runtime_error("Error: Duplicate server name: " + names[j]);
+				for (size_t i = 0; i < names.size(); ++i)
+				{
+					if (std::find(it + 1, servers.end(), names[i]) != servers.end())
+						throw std::runtime_error("Error: Duplicate server name: \"" + names[i] + "\"");
+				}
 			}
 		}
 	}

@@ -97,7 +97,11 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, S
 			response = readFile(servData.root + servData.error_pages[status]);
 		else
 		{
-			if (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py")
+			if (client.method == "DELETE")
+			{
+				response = "<center><h1>Deleted file " + servData.root + client.url + "</h1></center>";
+			}
+			else if (fileName.rfind('.') != std::string::npos && fileName.substr(fileName.rfind('.')) == ".py")
 			{
 				callCgi(servData, client, response);
 			}

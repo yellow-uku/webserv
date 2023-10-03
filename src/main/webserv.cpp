@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 	try
 	{
 		conf.parse();
-		// conf.print();
+		conf.print();
 
 		TCPserver socket(conf);
 

@@ -4,23 +4,23 @@ import sys
 import os
 # from pathlib import Path
 
-print(f'Content Type: {os.environ.get("CONTENT_TYPE", "None")}\n')
+# print(f'Content Type: {os.environ.get("CONTENT_TYPE", "None")}\n')
 
 def parse_file():
 
 	# content_type = "CONTENT_TYPE=multipart/form-data; boundary=------WebKitFormBoundaryd1xz0AI76g1urKJw"
 
-	print("BEGIN PARSING POST REQUEST...\n")
+	# print("BEGIN PARSING POST REQUEST...\n")
 
 	content_type = os.environ["CONTENT_TYPE"]
 
-	print("content_type: ", content_type)
+	# print("content_type: ", content_type)
 
 	boundary = None
-	match = re.match(r"multipart/form-data;boundary=(.*)", content_type)
+	match = re.match(r"multipart/form-data;\s*boundary=(.*)", content_type)
 	if match:
 		boundary = match.group(1).strip().encode()
-		print("boundary: ", boundary)
+		# print("boundary: ", boundary)
 
 	# print(boundary)
 	if not boundary:
@@ -29,7 +29,7 @@ def parse_file():
 
 	file_content = sys.stdin.buffer.read()
 
-	print("file_content: ", file_content)
+	# print("file_content: ", file_content)
 	#with open(SERVER_READ_PATH / FILENAME, "rb") as f:
 	#    file_content = f.read()
 
@@ -60,7 +60,7 @@ def parse_file():
 		if key.lower() == b"content-disposition":
 			# content_type_name = None
 			content_type_filename = None
-			match = re.match(rb'form-data; name="(.*)"; filename="(.*)"', value)
+			match = re.match(rb'form-data;\s*name="(.*)";\s*filename="(.*)"', value)
 			if match:
 				# content_type_name = match.group(1)
 				content_type_filename = match.group(2)
@@ -86,21 +86,21 @@ def parse_file():
 	# if body.endswith(b"--"):
 	#     body = body[:-4]
 
-	print("BODY UPLOAD:\n", body)
-	# with open(str(SERVER_WRITE_PATH).encode() + b"/" +  content_type_filename, "wb") as f:
-	#     f.write(body)
+	# print("BODY UPLOAD:\n", body)
+	with open(str(os.environ.get("SERVER_WRITE_PATH", "None")).encode() + b"/" +  content_type_filename, "wb") as f:
+	    f.write(body)
 
 try:
 	parse_file()
-	print(f'Content Type: {os.environ.get("CONTENT_TYPE", "None")}')
+	# print(f'Content Type: {os.environ.get("CONTENT_TYPE", "None")}')
 	print("")
-	print("<center><br></br>")
+	print("<center>")
 	print("<h1>Success!</h1>")
 	print("</center>")
 except Exception as e:
-	print(f'Content Type: {os.environ.get("CONTENT_TYPE", "None")}')
+	# print(f'Content Type: {os.environ.get("CONTENT_TYPE", "None")}')
 	print("")
-	print("<center><br></br>")
+	print("<center>")
 	print("<h1>Fail...</h1>")
 	print("</center>")
 	print("Exception: ", e)
