@@ -232,19 +232,11 @@ i[class|="fa"]{
 	padding:10px 15px;
 	color:white;
 	background-color: black;
-	> i {
-		color: white;
-	}
-	float:right;
-	right:0;
 }
 .submit-button:hover{
 	background-color: gray;
 	color:gold;
 	border-color: rgba(0,0,0,0);
-	> i {
-		color: #FFD700;
-	}
 }
 .content-3{
 	position: relative;

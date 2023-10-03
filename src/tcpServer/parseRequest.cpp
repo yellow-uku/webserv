@@ -54,6 +54,48 @@ bool TCPserver::findKeyValue(std::string &line, ClientInfo& client)
 	return true;
 }
 
+void TCPserver::printHttpMessage(ClientInfo& client)
+{
+	std::vector<std::string> messageInfo;
+	std::string line;
+	std::istringstream	res(client.allRequest);
+
+	while (std::getline(res, line))
+		messageInfo.push_back(line);
+
+	std::map<std::string,std::string>	messageHeaders;
+
+    for (size_t i = 0; i < messageInfo.size(); ++i) {
+        size_t colonPos = messageInfo[i].find(":");
+        if (colonPos != std::string::npos) {
+            std::string messageHeader = messageInfo[i].substr(0, colonPos);
+			std::string messageValue = messageInfo[i].substr(colonPos + 2);
+            messageHeaders[messageHeader] = messageValue;
+        }
+    }
+	// for (std::map<std::string, std::string>::iterator it = messageHeaders.begin(); it != messageHeaders.end(); ++it)
+	// 	std::cout << it->first << ": " << it->second << "\n";
+	if (client.method == "GET")
+	{
+		std::cout << "\n";
+		std::cout << client.method << " " << client.url << " " << client.httpVersion << "\n";
+		std::cout << "Host: " << messageHeaders["Host"] << "\n";
+		std::cout << "Accept: " << messageHeaders["Accept"] << "\n";
+		std::cout << "\n";
+	}
+	else if (client.method == "POST")
+	{
+		std::cout << "\n";
+		std::cout << client.method << " " << client.url << " " << client.httpVersion << "\n";
+		std::cout << "User-Agent: " << messageHeaders["User-Agent"] << "\n";
+		std::cout << "Host: " << messageHeaders["Referer"] << "\n";
+		std::cout << "Accept-Language: " << messageHeaders["Accept-Language"] << "\n";
+		std::cout << "Accept-Encoding: " << messageHeaders["Accept-Encoding"] << "\n";
+		std::cout << "Connection: " << messageHeaders["Connection"] << "\n";
+		std::cout << "\n";
+	}
+}
+
 void TCPserver::setUrlAndMethod(ClientInfo& client)
 {
 	std::stringstream ss;
@@ -77,14 +119,16 @@ void TCPserver::setUrlAndMethod(ClientInfo& client)
 	// erase last / of the url
 	if (url != "/" && url[url.size() - 1] == '/')
 		url.erase(url.size() - 1, 1);
-
-	std::cout << "method->" << client.method << std::endl;
-	std::cout << "url->" << client.url << std::endl;
-	std::cout << "query->" << client.query << std::endl;
-	std::cout << "HTTP version->" << client.httpVersion << std::endl << std::endl;
+	
+	// std::cout << "method->" << client.method << std::endl;
+	// std::cout << "url->" << client.url << std::endl;
+	// std::cout << "query->" << client.query << std::endl;
+	// std::cout << "HTTP version->" << client.httpVersion << std::endl << std::endl;
 
 	if (client.method.empty())
 		client.method = "NONE";
+
+	printHttpMessage(client);
 }
 
 void TCPserver::parseChunked(ClientInfo& client, size_t max_body_size)

@@ -1,9 +1,4 @@
 #!/usr/bin/python3
+import os
 
-import cgi, os
-
-form = cgi.FieldStorage()
-
-
-
-print os
+print(f'Env Variables: \n{os.environ.values()}\n')

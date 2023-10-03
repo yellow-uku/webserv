@@ -62,6 +62,7 @@ private:
 	void			parseChunked(ClientInfo& client, size_t max_body_size);
 	void			setUrlAndMethod(ClientInfo& client);
 	void			setResponseFile(ClientInfo& client, socket_t& listen);
+	void			printHttpMessage(ClientInfo& client);
 	void			buildResponse(std::string& fileName, ResponseHeaders &heading, ServerInfo servData, bool dir, ClientInfo& client);
 	bool			findKeyValue(std::string& line, ClientInfo& client);
 	bool			sendResponse(int clnt);
