@@ -57,8 +57,6 @@ ServerInfo& TCPserver::getLocationData(const socket_t& socket, const std::string
 			}
 		}
 
-		std::cout << it->server_names[0] << "---------------------------\n";
-
 		TCPserver::info_iterator l_it = findLocation(it, route);
 
 		return l_it == it->info.location.end() ? it->info : l_it->second;

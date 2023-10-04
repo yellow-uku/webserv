@@ -47,24 +47,26 @@ int TCPserver::receive(ClientInfo& client, int clnt, socket_t& socket)
 			return 1;
 	}
 
-	if (!client.requestHeaders["Content-Length"].empty())
-	{
-		ServerInfo& servData = getLocationData(socket, client.requestHeaders["Host"], client.url);
-
-		if (client.allRequest.size() >= servData.max_body_size
-			|| client.allRequest.size() == my_stos_t(client.requestHeaders["Content-Length"]))
-		{
-			client.requestBody = client.allRequest;
-			return 1;
-		}
-	}
-	else if (client.requestHeaders["Transfer-Encoding"] == "chunked")
+	if (client.requestHeaders["Transfer-Encoding"] == "chunked")
 	{
 		if (client.allRequest.find("\r\n0\r\n") != std::string::npos)
 		{
 			ServerInfo& servData = getLocationData(socket, client.requestHeaders["Host"], client.url);
 
 			parseChunked(client, servData.max_body_size);
+			return 1;
+		}
+	}
+	else if (!client.requestHeaders["Content-Length"].empty())
+	{
+		ServerInfo& servData = getLocationData(socket, client.requestHeaders["Host"], client.url);
+
+		ssize_t length = my_stos_t(client.requestHeaders["Content-Length"]);
+
+		if (length < 0 || client.allRequest.size() >= servData.max_body_size
+			|| client.allRequest.size() == static_cast<size_t>(length))
+		{
+			client.requestBody = client.allRequest;
 			return 1;
 		}
 	}

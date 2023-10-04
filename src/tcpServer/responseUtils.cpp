@@ -33,7 +33,8 @@ void TCPserver::setResponseFile(ClientInfo& client, socket_t& socket)
 
 	if (client.method == "POST"
 		&& ((client.requestHeaders["Content-Length"].empty()
-		&& client.requestHeaders["Transfer-Encoding"].empty()) || client.chunkedFail))
+		&& client.requestHeaders["Transfer-Encoding"].empty())
+		|| client.chunkedFail || my_stos_t(client.requestHeaders["Content-Length"]) < 0))
 	{
 		heading.http_status = "411";
 		buildResponse(fileName, heading, servData, 0, client);
@@ -135,6 +136,8 @@ void TCPserver::buildResponse(std::string &fileName, ResponseHeaders &heading, S
 		heading.build_headers();
 		response = heading.headers + listDir(fileName);
 	}
+
+	// std::cout << "RESPONSE:\n" << response << "\n";
 }
 
 std::string TCPserver::correctIndexFile(std::string &fileName, ServerInfo &servData, ResponseHeaders& headers)

@@ -48,6 +48,18 @@
 		"sstream": "cpp",
 		"stdexcept": "cpp",
 		"streambuf": "cpp",
-		"typeinfo": "cpp"
+		"typeinfo": "cpp",
+		"__bit_reference": "cpp",
+		"__tree": "cpp",
+		"__config": "cpp",
+		"__debug": "cpp",
+		"__functional_base": "cpp",
+		"__locale": "cpp",
+		"__nullptr": "cpp",
+		"__split_buffer": "cpp",
+		"__tuple": "cpp",
+		"cstring": "cpp",
+		"ios": "cpp",
+		"locale": "cpp"
 	}
 }

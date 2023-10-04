@@ -11,7 +11,7 @@
 # define ALLOWED_METHODS "GET"
 # define DEFAULT_AUTOINDEX "off"
 # define DEFAULT_INDEX "index.html"
-# define DEFAULT_CGI "/usr/bin/python3"
+# define DEFAULT_CGI "/usr/local/bin/python3"
 # define UPLOAD_DIRECTORY "/upload/"
 
 class Location

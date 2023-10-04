@@ -101,12 +101,12 @@ int my_stoi(const std::string& s)
 }
 
 // size_t?
-size_t my_stos_t(const std::string& s)
+ssize_t my_stos_t(const std::string& s)
 {
-	if (s.size() > 10 || (s.size() == 10 && s > "2147483647")
+	if (s.size() > 10 || (s.size() == 10 && s > my_to_string(SIZE_MAX))
 		|| std::find_if(s.begin(), s.end(), NonDigit()) != s.end())
 		return (-1);
-	
+
 	size_t res = 0;
 
 	for (size_t i = 0; i < s.size(); ++i)
