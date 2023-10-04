@@ -14,6 +14,10 @@
 # define DEFAULT_SERVER_NAME ""
 # define DEFAULT_MAX_BODY_SIZE 1000000 // 1M
 
+# ifndef DEFAULT_ROOT
+#  define DEFAULT_ROOT "./www"
+# endif
+
 # define DEFAULT_403_PAGE "error_pages/403.html"
 # define DEFAULT_404_PAGE "error_pages/404.html"
 

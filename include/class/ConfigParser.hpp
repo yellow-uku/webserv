@@ -21,9 +21,9 @@
 
 # define IS_OUTSIDE_LOCATION(token, prevToken) (strncmp(prevToken.c_str(), token.c_str(), prevToken.length()) != 0)
 
-#define MAX_BODY_SIZE_G (3L)
-#define MAX_BODY_SIZE_M (1024L * MAX_BODY_SIZE_G)
-#define MAX_BODY_SIZE_K (1024L * 1024L * MAX_BODY_SIZE_G)
+# define MAX_BODY_SIZE_G (3L)
+# define MAX_BODY_SIZE_M (1024L * MAX_BODY_SIZE_G)
+# define MAX_BODY_SIZE_K (1024L * 1024L * MAX_BODY_SIZE_G)
 
 class ConfigParser
 
