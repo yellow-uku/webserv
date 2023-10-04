@@ -60,6 +60,20 @@
 		"__tuple": "cpp",
 		"cstring": "cpp",
 		"ios": "cpp",
-		"locale": "cpp"
+		"locale": "cpp",
+		"__errc": "cpp",
+		"__hash_table": "cpp",
+		"__mutex_base": "cpp",
+		"__node_handle": "cpp",
+		"__string": "cpp",
+		"__threading_support": "cpp",
+		"chrono": "cpp",
+		"complex": "cpp",
+		"ctime": "cpp",
+		"iomanip": "cpp",
+		"mutex": "cpp",
+		"optional": "cpp",
+		"ratio": "cpp",
+		"stack": "cpp"
 	}
 }

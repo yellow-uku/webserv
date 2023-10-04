@@ -68,8 +68,6 @@ void TCPserver::server_loop()
 	fd_set main_write;
 
 	struct timeval timeout;
-	struct sockaddr_in clntAddr;
-	socklen_t clntAddrlen = sizeof(clntAddr);
 
 	std::vector<socket_t> allFd;
 
@@ -134,6 +132,9 @@ void TCPserver::server_loop()
 
 					if (it != sockets.end())
 					{
+						struct sockaddr_in clntAddr;
+						socklen_t clntAddrlen = sizeof(clntAddr);
+
 						int clnt = accept(i, (struct sockaddr *)&clntAddr, &clntAddrlen);
 
 						if (clnt < 0)

@@ -7,6 +7,7 @@
 # include <algorithm>
 
 # include <unistd.h>
+# include <stdint.h>
 
 struct listen_t;
 
