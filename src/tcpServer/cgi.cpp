@@ -76,36 +76,40 @@ void TCPserver::callCgi(ServerInfo& servData, ClientInfo& client, std::string& r
 	close(pipe_to_child[READ]);
 	close(pipe_from_child[WRITE]);
 
+	int res;
+	fd_set child_fd;
+	struct timeval timeout = {CGI_TIMEOUT, 0};
+
+	FD_ZERO(&child_fd);
+	FD_SET(pipe_to_child[WRITE], &child_fd);
+
 	if (client.method == "POST")
 	{
-		while (1)
+		while ((res = select(pipe_to_child[WRITE] + 1, NULL, &child_fd, NULL, &timeout) > 0))
 		{
-			time_t start = time(NULL);
 			ssize_t bytes;
+			timeout.tv_sec = CGI_TIMEOUT;
 
-			while ((bytes = write(pipe_to_child[WRITE], client.requestBody.c_str(), client.requestBody.size())) > 0)
-			{
-				start = time(NULL);
-				client.requestBody.erase(0, bytes);
-			}
+			bytes = write(pipe_to_child[WRITE], client.requestBody.c_str(), client.requestBody.size());
+			client.requestBody.erase(0, bytes);
 
 			if (client.requestBody.empty())
 				break ;
+		}
 
-			if (time(NULL) - start >= CGI_TIMEOUT)
-			{
-				close(pipe_to_child[WRITE]);
-				close(pipe_from_child[READ]);
+		if (res == 0)
+		{
+			close(pipe_to_child[WRITE]);
+			close(pipe_from_child[READ]);
 
-				kill(child, SIGKILL);
-				response = readFile(servData.root + servData.error_pages[408]);
+			kill(child, SIGKILL);
+			response = readFile(servData.root + servData.error_pages[408]);
 
-				waitpid(child, NULL, 0);
+			waitpid(child, NULL, 0);
 
-				std::cout << "--------------------CGI TIMEOUT WRITE--------------------\n";
+			std::cout << "--------------------CGI TIMEOUT WRITE--------------------\n";
 
-				return ;
-			}
+			return ;
 		}
 	}
 
@@ -114,13 +118,10 @@ void TCPserver::callCgi(ServerInfo& servData, ClientInfo& client, std::string& r
 	char c;
 	ssize_t bytesRead;
 
-	fd_set child_fd;
-	struct timeval timeout = {5, 0};
-
 	FD_ZERO(&child_fd);
 	FD_SET(pipe_from_child[READ], &child_fd);
-
-	int res;
+	timeout.tv_sec = 8;
+	timeout.tv_usec = 0;
 
 	while ((res = select(pipe_from_child[READ] + 1, &child_fd, NULL, NULL, &timeout)) > 0)
 	{
